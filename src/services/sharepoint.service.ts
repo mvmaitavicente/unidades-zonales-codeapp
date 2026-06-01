@@ -1,71 +1,46 @@
-import type {
-  AccountInfo,
-  IPublicClientApplication,
-} from "@azure/msal-browser";
+import type { MedioCoordinacion } from "../types/catalogo.types";
 
-export type MedioCoordinacion = {
-  id: string;
-  IdMedio: string;
-  DescripcionMedio: string;
-};
+const FLOW_MEDIOS_URL =
+  "https://5b61b3f50e90e928bcaee69127947f.06.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4629b2d545734c458b8e698ab7742f64/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QlVR6SahW_71dbQBI_SBEUxebzH-d-hnScTaZOB64Bg";
 
-async function fetchGraph(url: string, accessToken: string) {
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json",
-    },
-  });
+const CACHE_KEY = "catalogo_UZ_MedioCoordinacion";
+const CACHE_TIME_KEY = "catalogo_UZ_MedioCoordinacion_time";
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hora
 
-  const text = await response.text();
+export async function listarMediosCoordinacion(): Promise<MedioCoordinacion[]> {
+  const cache = localStorage.getItem(CACHE_KEY);
+  const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
 
-  console.log("=================================");
-  console.log("URL:", url);
-  console.log("STATUS:", response.status);
-  console.log("RESPONSE:", text);
-  console.log("=================================");
+  if (cache && cacheTime) {
+    const edadCache = Date.now() - Number(cacheTime);
 
-  if (!response.ok) {
-    throw new Error(`Graph error ${response.status}: ${text}`);
+    if (edadCache < CACHE_DURATION) {
+      return JSON.parse(cache) as MedioCoordinacion[];
+    }
   }
 
-  return JSON.parse(text);
-}
-
-export async function getMediosCoordinacion(
-  instance: IPublicClientApplication,
-  account: AccountInfo
-): Promise<MedioCoordinacion[]> {
-  const token = await instance.acquireTokenSilent({
-    account,
-    scopes: ["User.Read", "Sites.Read.All"],
+  const response = await fetch(FLOW_MEDIOS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
   });
 
-  console.log("ACCESS TOKEN:", token.accessToken);
+  if (!response.ok) {
+    throw new Error(`Error HTTP al listar medios: ${response.status}`);
+  }
 
-  const hostname = "proniedoti.sharepoint.com";
-  const sitePath = "sites/OTI_PUBLICACION";
-  const listName = "UZ_MedioCoordinacion";
+  const result = await response.json();
+  const data = (result.data ?? []) as MedioCoordinacion[];
 
-  const site = await fetchGraph(
-    `https://graph.microsoft.com/v1.0/sites/${hostname}:/${sitePath}`,
-    token.accessToken
-  );
+  localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
 
-  console.log("SITE:", site);
+  return data;
+}
 
-  const data = await fetchGraph(
-    `https://graph.microsoft.com/v1.0/sites/${site.id}/lists/${listName}/items?$expand=fields&$top=500`,
-    token.accessToken
-  );
-
-  console.log("DATA VALUE:", data.value);
-  console.log("FIRST FIELDS:", data.value?.[0]?.fields);
-
-  return data.value.map((item: any) => ({
-    id: String(item.id ?? ""),
-    IdMedio: String(item.fields.IdMedio ?? ""),
-    DescripcionMedio: String(item.fields.DescripcionMedio ?? ""),
-  }));
+export function limpiarCacheMediosCoordinacion(): void {
+  localStorage.removeItem(CACHE_KEY);
+  localStorage.removeItem(CACHE_TIME_KEY);
 }
