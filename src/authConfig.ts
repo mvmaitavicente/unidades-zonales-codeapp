@@ -5,6 +5,10 @@ export const msalConfig = {
       "https://login.microsoftonline.com/7542cdab-2ecf-4371-956f-41795bcb56f7",
     redirectUri: "http://localhost:5173",
   },
+    cache: {
+    cacheLocation: "localStorage",
+    storeAuthStateInCookie: false,
+  },
 };
 
 export const loginRequest = {
