@@ -1,6 +1,8 @@
 import type { Configuration } from "@azure/msal-browser";
 
-export const getMsalRedirectUri = () => window.location.origin;
+export const getMsalRedirectUri = () => {
+  return `${window.location.origin}/auth-redirect.html`;
+};
 
 export const msalConfig: Configuration = {
   auth: {
@@ -8,7 +10,7 @@ export const msalConfig: Configuration = {
     authority:
       "https://login.microsoftonline.com/7542cdab-2ecf-4371-956f-41795bcb56f7",
     redirectUri: getMsalRedirectUri(),
-    postLogoutRedirectUri: getMsalRedirectUri(),
+    postLogoutRedirectUri: window.location.origin,
   },
   cache: {
     cacheLocation: "localStorage",
