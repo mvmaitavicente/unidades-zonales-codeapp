@@ -1,8 +1,5 @@
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import {
-  AuthenticatedTemplate,
-  UnauthenticatedTemplate,
-} from "@azure/msal-react";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
@@ -15,33 +12,37 @@ import EntidadesPage from "../pages/Maestros/EntidadesPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
 
 export default function AppRoutes() {
+  const isAuthenticated = useIsAuthenticated();
+
   return (
     <HashRouter>
-      <UnauthenticatedTemplate>
-        <Routes>
-          <Route path="*" element={<LoginPage />} />
-        </Routes>
-      </UnauthenticatedTemplate>
+      <Routes>
+        {!isAuthenticated ? (
+          <>
+            <Route path="*" element={<LoginPage />} />
+          </>
+        ) : (
+          <>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Navigate to="/inicio" replace />} />
+              <Route path="/inicio" element={<HomePage />} />
+              <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
+              <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
 
-      <AuthenticatedTemplate>
-        <Routes>
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<HomePage />} />
-            <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
-            <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
-            <Route
-              path="/administracion/catalogos/:catalogoKey"
-              element={<CatalogosAdminPage />}
-            />
-            <Route path="/maestros/autoridades" element={<AutoridadesPage />} />
-            <Route path="/maestros/personal" element={<PersonalPage />} />
-            <Route path="/maestros/entidades" element={<EntidadesPage />} />
+              <Route
+                path="/administracion/catalogos/:catalogoKey"
+                element={<CatalogosAdminPage />}
+              />
 
-            <Route path="*" element={<Navigate to="/inicio" replace />} />
-          </Route>
-        </Routes>
-      </AuthenticatedTemplate>
+              <Route path="/maestros/autoridades" element={<AutoridadesPage />} />
+              <Route path="/maestros/personal" element={<PersonalPage />} />
+              <Route path="/maestros/entidades" element={<EntidadesPage />} />
+
+              <Route path="*" element={<Navigate to="/inicio" replace />} />
+            </Route>
+          </>
+        )}
+      </Routes>
     </HashRouter>
   );
 }

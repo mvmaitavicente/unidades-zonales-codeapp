@@ -1,11 +1,9 @@
 import { useMsal } from "@azure/msal-react";
-import { useNavigate } from "react-router-dom";
 import { getMsalRedirectUri, loginRequest } from "../authConfig";
 import { Building2 } from "lucide-react";
 
 export default function LoginPage() {
   const { instance } = useMsal();
-  const navigate = useNavigate();
 
   const iniciarSesion = async () => {
     try {
@@ -16,7 +14,7 @@ export default function LoginPage() {
 
       if (result.account) {
         instance.setActiveAccount(result.account);
-        navigate("/inicio", { replace: true });
+        window.location.hash = "#/inicio";
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
