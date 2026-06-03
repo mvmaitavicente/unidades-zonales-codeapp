@@ -1,5 +1,6 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useIsAuthenticated } from "@azure/msal-react";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useMsal } from "@azure/msal-react";
 
 import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
@@ -12,10 +13,22 @@ import EntidadesPage from "../pages/Maestros/EntidadesPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
 
 export default function AppRoutes() {
-  const isAuthenticated = useIsAuthenticated();
+  const { instance } = useMsal();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const accounts = instance.getAllAccounts();
+
+    if (accounts.length > 0) {
+      instance.setActiveAccount(accounts[0]);
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, [instance]);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         {!isAuthenticated ? (
           <Route path="*" element={<LoginPage />} />
@@ -39,6 +52,6 @@ export default function AppRoutes() {
           </Route>
         )}
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }

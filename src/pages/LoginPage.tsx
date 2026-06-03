@@ -1,25 +1,12 @@
 import { useMsal } from "@azure/msal-react";
-import { getMsalRedirectUri, loginRequest } from "../authConfig";
+import { loginRequest } from "../authConfig";
 import { Building2 } from "lucide-react";
 
 export default function LoginPage() {
   const { instance } = useMsal();
 
   const iniciarSesion = async () => {
-    try {
-      const result = await instance.loginPopup({
-        ...loginRequest,
-        redirectUri: getMsalRedirectUri(),
-      });
-
-      if (result.account) {
-        instance.setActiveAccount(result.account);
-
-        window.location.replace(`${window.location.origin}/#/inicio`);
-      }
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-    }
+    await instance.loginRedirect(loginRequest);
   };
 
   return (
