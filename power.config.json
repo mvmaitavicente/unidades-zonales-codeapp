@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "appId": "5c7541e8-216c-4f48-a7d3-0135c96e6511",
+  "appDisplayName": "Registro de Visitas",
+  "region": "prod",
+  "environmentId": "Default-7542cdab-2ecf-4371-956f-41795bcb56f7",
+  "description": " ",
+  "buildPath": "dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:5173",
+  "logoPath": "Default",
+  "connectionReferences": {},
+  "databaseReferences": {}
+}

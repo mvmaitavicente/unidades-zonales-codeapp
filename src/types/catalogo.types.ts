@@ -1,13 +1,12 @@
-export type MedioCoordinacion = {
-  ID: number;
-  Codigo: string;
-  Descripcion: string;
-  Activo: boolean;
+export type CatalogoItem = {
+  itemId: string;
+  id: number;
+  descripcion: string;
+  activo: boolean;
 };
 
-export type CatalogoVersion = {
-  ID: number;
-  NombreTabla: string;
-  TipoTabla: string;
-  Modified: string;
+export type CatalogoFormData = {
+  itemId?: string;
+  descripcion: string;
+  activo: boolean;
 };

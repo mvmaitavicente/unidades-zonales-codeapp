@@ -1,13 +1,13 @@
-export default function HomePage() {
+export default function PersonalPage() {
   return (
     <div className="page">
       <div className="page-heading">
-        <h1>Inicio</h1>
-        <p>Vista general del sistema de registro de visitas.</p>
+        <h1>Personal</h1>
+        <p>Administración del personal institucional.</p>
       </div>
 
       <div className="blank-card">
-        <h2>Pantalla de inicio</h2>
+        <h2>Maestro de personal</h2>
         <p>Contenido pendiente de implementación.</p>
       </div>
     </div>
