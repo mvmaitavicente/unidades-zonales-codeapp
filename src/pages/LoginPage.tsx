@@ -14,7 +14,8 @@ export default function LoginPage() {
 
       if (result.account) {
         instance.setActiveAccount(result.account);
-        window.location.hash = "#/inicio";
+
+        window.location.replace(`${window.location.origin}/#/inicio`);
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);

@@ -18,29 +18,25 @@ export default function AppRoutes() {
     <HashRouter>
       <Routes>
         {!isAuthenticated ? (
-          <>
-            <Route path="*" element={<LoginPage />} />
-          </>
+          <Route path="*" element={<LoginPage />} />
         ) : (
-          <>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Navigate to="/inicio" replace />} />
-              <Route path="/inicio" element={<HomePage />} />
-              <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
-              <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Navigate to="/inicio" replace />} />
+            <Route path="/inicio" element={<HomePage />} />
+            <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
+            <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
 
-              <Route
-                path="/administracion/catalogos/:catalogoKey"
-                element={<CatalogosAdminPage />}
-              />
+            <Route
+              path="/administracion/catalogos/:catalogoKey"
+              element={<CatalogosAdminPage />}
+            />
 
-              <Route path="/maestros/autoridades" element={<AutoridadesPage />} />
-              <Route path="/maestros/personal" element={<PersonalPage />} />
-              <Route path="/maestros/entidades" element={<EntidadesPage />} />
+            <Route path="/maestros/autoridades" element={<AutoridadesPage />} />
+            <Route path="/maestros/personal" element={<PersonalPage />} />
+            <Route path="/maestros/entidades" element={<EntidadesPage />} />
 
-              <Route path="*" element={<Navigate to="/inicio" replace />} />
-            </Route>
-          </>
+            <Route path="*" element={<Navigate to="/inicio" replace />} />
+          </Route>
         )}
       </Routes>
     </HashRouter>
