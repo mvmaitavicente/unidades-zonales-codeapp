@@ -1,17 +1,6 @@
-
 import type { Configuration } from "@azure/msal-browser";
 
-export const getMsalRedirectUri = () => {
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
-  if (isLocalhost) {
-    return "http://localhost:5173";
-  }
-
-  return "https://default7542cdab2ecf4371956f41795bcb56.f7.environment.api.powerplatformusercontent.com";
-};
+export const getMsalRedirectUri = () => window.location.origin;
 
 export const msalConfig: Configuration = {
   auth: {
