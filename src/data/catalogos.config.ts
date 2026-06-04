@@ -32,7 +32,7 @@ export const catalogosConfig = {
     listaSharePoint: "UZ_TipoEntidad",
     siteId: "proniedoti.sharepoint.com,24c388e8-793d-47b7-8687-18028d6663f7,9939e5bc-b700-4b5d-a796-67bd4da3a462",
     listId: "ea8f0b12-dcda-4645-b7ae-c9769bbce349",
-    campoDescripcion: "field_1",
+    campoDescripcion: "field_2",
   },
 } as const;
 

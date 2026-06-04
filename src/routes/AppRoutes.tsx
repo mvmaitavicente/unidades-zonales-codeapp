@@ -7,9 +7,7 @@ import HomePage from "../pages/HomePage";
 import RegistroVisitasPage from "../pages/RegistroVisitasPage";
 import BandejaVisitasPage from "../pages/BandejaVisitasPage";
 import CatalogosAdminPage from "../pages/Administracion/CatalogosAdminPage";
-import AutoridadesPage from "../pages/Maestros/AutoridadesPage";
-import PersonalPage from "../pages/Maestros/PersonalPage";
-import EntidadesPage from "../pages/Maestros/EntidadesPage";
+import MaestroAdminPage from "../pages/Maestros/MaestroAdminPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
 
 export default function AppRoutes() {
@@ -44,9 +42,7 @@ export default function AppRoutes() {
               element={<CatalogosAdminPage />}
             />
 
-            <Route path="/maestros/autoridades" element={<AutoridadesPage />} />
-            <Route path="/maestros/personal" element={<PersonalPage />} />
-            <Route path="/maestros/entidades" element={<EntidadesPage />} />
+            <Route path="/maestros/:maestroKey" element={<MaestroAdminPage />} />
 
             <Route path="*" element={<Navigate to="/inicio" replace />} />
           </Route>
