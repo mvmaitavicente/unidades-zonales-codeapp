@@ -1,8 +1,6 @@
 import { graphFetch } from "./graph.service";
 import type {
-  LookupOption,
   MaestroConfig,
-  MaestroFieldConfig,
   MaestroFormData,
   MaestroItem,
 } from "../types/maestro.types";
@@ -99,9 +97,15 @@ function normalizarItem(
         item.fields[`${field.key}LookupId`] ?? 0
       );
       values[field.key] = String(item.fields[field.key] ?? "");
-    } else {
-      values[field.key] = item.fields[field.key] ?? "";
+      return;
     }
+
+    if (field.type === "boolean") {
+      values[field.key] = Boolean(item.fields[field.key]);
+      return;
+    }
+
+    values[field.key] = item.fields[field.key] ?? "";
   });
 
   return {
@@ -135,54 +139,6 @@ export async function listarMaestro(
   return registros.map((item) => normalizarItem(item, config));
 }
 
-export async function listarLookupOptions(
-  listaSharePoint: string,
-  campoTexto = "Descripcion"
-): Promise<LookupOption[]> {
-  const { siteId, listId } = await getListContext(listaSharePoint);
-
-  const url =
-    `${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items` +
-    `?$select=id` +
-    `&$expand=fields($select=${campoTexto},Activo)` +
-    `&$top=5000`;
-
-  const response = await graphFetch<GraphListItemsResponse>(url);
-
-  return response.value
-    .filter((item) => {
-      if (item.fields.Activo === undefined) return true;
-      return Boolean(item.fields.Activo);
-    })
-    .map((item) => ({
-      value: Number(item.id),
-      label: String(item.fields[campoTexto] ?? ""),
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-}
-
-export async function cargarLookupsMaestro(
-  config: MaestroConfig
-): Promise<Record<string, LookupOption[]>> {
-  const lookupFields = config.fields.filter(
-    (field): field is MaestroFieldConfig =>
-      field.type === "lookup" && Boolean(field.lookupList)
-  );
-
-  const entries = await Promise.all(
-    lookupFields.map(async (field) => {
-      const options = await listarLookupOptions(
-        field.lookupList!,
-        field.lookupTextField ?? "Descripcion"
-      );
-
-      return [field.key, options] as const;
-    })
-  );
-
-  return Object.fromEntries(entries);
-}
-
 function construirPayloadFields(
   config: MaestroConfig,
   data: MaestroFormData
@@ -190,18 +146,17 @@ function construirPayloadFields(
   const fields: Record<string, unknown> = {};
 
   const titleField = config.titleField;
-  const titleValue =
+
+  fields.Title =
     titleField && data[titleField]
       ? String(data[titleField])
       : config.titulo;
-
-  fields.Title = titleValue;
 
   config.fields.forEach((field) => {
     const value = data[field.key];
 
     if (field.type === "lookup") {
-      fields[`${field.key}LookupId`] = Number(value);
+      fields[`${field.key}LookupId`] = value ? Number(value) : null;
       return;
     }
 

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import type {
-  LookupOption,
   MaestroConfig,
   MaestroFormData,
   MaestroItem,
 } from "../../types/maestro.types";
+import type { LookupOption } from "../../contexts/CatalogosGlobalContext";
 
 type Props = {
   config: MaestroConfig;
   itemEditando?: MaestroItem | null;
-  lookups: Record<string, LookupOption[]>;
+  catalogos: Record<string, LookupOption[]>;
   saving: boolean;
   onGuardar: (data: MaestroFormData, itemId?: string) => Promise<void>;
   onCancelar: () => void;
@@ -18,7 +18,7 @@ type Props = {
 export default function MaestroForm({
   config,
   itemEditando,
-  lookups,
+  catalogos,
   saving,
   onGuardar,
   onCancelar,
@@ -88,6 +88,11 @@ export default function MaestroForm({
           }
 
           if (field.type === "lookup") {
+            const options =
+              field.catalogoKey && catalogos[field.catalogoKey]
+                ? catalogos[field.catalogoKey]
+                : [];
+
             return (
               <div key={field.key} className="form-field">
                 <label>
@@ -104,7 +109,7 @@ export default function MaestroForm({
                 >
                   <option value="">Seleccionar</option>
 
-                  {(lookups[field.key] ?? []).map((option) => (
+                  {options.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>

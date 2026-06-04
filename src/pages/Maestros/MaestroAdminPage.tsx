@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { maestrosConfig } from "../../config/maestros.config";
-import type { MaestroItem } from "../../types/maestro.types";
+import type { MaestroConfig, MaestroItem } from "../../types/maestro.types";
 import { useMaestro } from "../../hooks/useMaestro";
+import { useCatalogosGlobal } from "../../hooks/useCatalogosGlobal";
 import MaestroForm from "../../components/Maestros/MaestroForm";
 import MaestroTable from "../../components/Maestros/MaestroTable";
 
@@ -14,9 +15,6 @@ export default function MaestroAdminPage() {
     return maestrosConfig[maestroKey] ?? null;
   }, [maestroKey]);
 
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [itemEditando, setItemEditando] = useState<MaestroItem | null>(null);
-
   if (!config) {
     return (
       <div className="page-content">
@@ -26,8 +24,16 @@ export default function MaestroAdminPage() {
     );
   }
 
-  const { items, lookups, loading, saving, guardar, cambiarEstado } =
+  return <MaestroAdminContent config={config} />;
+}
+
+function MaestroAdminContent({ config }: { config: MaestroConfig }) {
+  const { catalogos, loading: loadingCatalogos } = useCatalogosGlobal();
+  const { items, loading, saving, guardar, cambiarEstado } =
     useMaestro(config);
+
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [itemEditando, setItemEditando] = useState<MaestroItem | null>(null);
 
   const nuevoRegistro = () => {
     setItemEditando(null);
@@ -69,14 +75,18 @@ export default function MaestroAdminPage() {
         <div className="content-card">
           <h2>{itemEditando ? "Editar registro" : "Nuevo registro"}</h2>
 
-          <MaestroForm
-            config={config}
-            itemEditando={itemEditando}
-            lookups={lookups}
-            saving={saving}
-            onGuardar={guardarRegistro}
-            onCancelar={cancelar}
-          />
+          {loadingCatalogos ? (
+            <p>Cargando opciones...</p>
+          ) : (
+            <MaestroForm
+              config={config}
+              itemEditando={itemEditando}
+              catalogos={catalogos}
+              saving={saving}
+              onGuardar={guardarRegistro}
+              onCancelar={cancelar}
+            />
+          )}
         </div>
       )}
 

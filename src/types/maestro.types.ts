@@ -1,14 +1,11 @@
+import type { CatalogoGlobalKey } from "../config/catalogos-global.config";
+
 export type MaestroFieldType =
   | "text"
   | "email"
   | "number"
   | "boolean"
   | "lookup";
-
-export type LookupOption = {
-  value: number;
-  label: string;
-};
 
 export type MaestroFieldConfig = {
   key: string;
@@ -18,8 +15,7 @@ export type MaestroFieldConfig = {
   visibleInTable?: boolean;
   maxLength?: number;
 
-  lookupList?: string;
-  lookupTextField?: string;
+  catalogoKey?: CatalogoGlobalKey;
 };
 
 export type MaestroConfig = {

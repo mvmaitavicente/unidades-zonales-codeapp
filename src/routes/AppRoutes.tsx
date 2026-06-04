@@ -9,6 +9,31 @@ import BandejaVisitasPage from "../pages/BandejaVisitasPage";
 import CatalogosAdminPage from "../pages/Administracion/CatalogosAdminPage";
 import MaestroAdminPage from "../pages/Maestros/MaestroAdminPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
+import { CatalogosGlobalProvider } from "../contexts/CatalogosGlobalContext";
+
+function AuthenticatedRoutes() {
+  return (
+    <CatalogosGlobalProvider>
+      <Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Navigate to="/inicio" replace />} />
+          <Route path="/inicio" element={<HomePage />} />
+          <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
+          <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
+
+          <Route
+            path="/administracion/catalogos/:catalogoKey"
+            element={<CatalogosAdminPage />}
+          />
+
+          <Route path="/maestros/:maestroKey" element={<MaestroAdminPage />} />
+
+          <Route path="*" element={<Navigate to="/inicio" replace />} />
+        </Route>
+      </Routes>
+    </CatalogosGlobalProvider>
+  );
+}
 
 export default function AppRoutes() {
   const { instance } = useMsal();
@@ -27,27 +52,13 @@ export default function AppRoutes() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        {!isAuthenticated ? (
+      {isAuthenticated ? (
+        <AuthenticatedRoutes />
+      ) : (
+        <Routes>
           <Route path="*" element={<LoginPage />} />
-        ) : (
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<HomePage />} />
-            <Route path="/registro-visitas" element={<RegistroVisitasPage />} />
-            <Route path="/bandeja-visitas" element={<BandejaVisitasPage />} />
-
-            <Route
-              path="/administracion/catalogos/:catalogoKey"
-              element={<CatalogosAdminPage />}
-            />
-
-            <Route path="/maestros/:maestroKey" element={<MaestroAdminPage />} />
-
-            <Route path="*" element={<Navigate to="/inicio" replace />} />
-          </Route>
-        )}
-      </Routes>
+        </Routes>
+      )}
     </BrowserRouter>
   );
 }

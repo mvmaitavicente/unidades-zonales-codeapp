@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import type {
-  LookupOption,
   MaestroConfig,
   MaestroFormData,
   MaestroItem,
@@ -8,14 +7,12 @@ import type {
 import {
   actualizarMaestro,
   cambiarEstadoMaestro,
-  cargarLookupsMaestro,
   crearMaestro,
   listarMaestro,
 } from "../services/maestro.service";
 
 export function useMaestro(config: MaestroConfig) {
   const [items, setItems] = useState<MaestroItem[]>([]);
-  const [lookups, setLookups] = useState<Record<string, LookupOption[]>>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -23,13 +20,8 @@ export function useMaestro(config: MaestroConfig) {
     setLoading(true);
 
     try {
-      const [maestroItems, maestroLookups] = await Promise.all([
-        listarMaestro(config),
-        cargarLookupsMaestro(config),
-      ]);
-
+      const maestroItems = await listarMaestro(config);
       setItems(maestroItems);
-      setLookups(maestroLookups);
     } finally {
       setLoading(false);
     }
@@ -73,7 +65,6 @@ export function useMaestro(config: MaestroConfig) {
 
   return {
     items,
-    lookups,
     loading,
     saving,
     cargar,
