@@ -1,22 +1,12 @@
-import { graphFetch } from "./graph.service";
+import { SHAREPOINT_CONFIG } from "../config/sharepoint.config";
 import type {
   MaestroConfig,
   MaestroFormData,
   MaestroItem,
 } from "../types/maestro.types";
+import { graphFetch } from "./graph.service";
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
-
-const HOSTNAME = "proniedoti.sharepoint.com";
-const SITE_PATH = "/sites/OTI_PUBLICACION";
-
-type GraphSiteResponse = {
-  id: string;
-};
-
-type GraphListResponse = {
-  id: string;
-};
 
 type GraphListItem = {
   id: string;
@@ -27,47 +17,6 @@ type GraphListItemsResponse = {
   value: GraphListItem[];
   "@odata.nextLink"?: string;
 };
-
-const siteCache: Record<string, string> = {};
-const listCache: Record<string, string> = {};
-
-async function getSiteId(): Promise<string> {
-  const cacheKey = `${HOSTNAME}${SITE_PATH}`;
-
-  if (siteCache[cacheKey]) {
-    return siteCache[cacheKey];
-  }
-
-  const site = await graphFetch<GraphSiteResponse>(
-    `${GRAPH_BASE}/sites/${HOSTNAME}:${SITE_PATH}`
-  );
-
-  siteCache[cacheKey] = site.id;
-  return site.id;
-}
-
-async function getListId(listaSharePoint: string): Promise<string> {
-  const siteId = await getSiteId();
-  const cacheKey = `${siteId}_${listaSharePoint}`;
-
-  if (listCache[cacheKey]) {
-    return listCache[cacheKey];
-  }
-
-  const list = await graphFetch<GraphListResponse>(
-    `${GRAPH_BASE}/sites/${siteId}/lists/${listaSharePoint}`
-  );
-
-  listCache[cacheKey] = list.id;
-  return list.id;
-}
-
-async function getListContext(listaSharePoint: string) {
-  const siteId = await getSiteId();
-  const listId = await getListId(listaSharePoint);
-
-  return { siteId, listId };
-}
 
 function getSelectFields(config: MaestroConfig): string {
   const fields = new Set<string>();
@@ -96,6 +45,7 @@ function normalizarItem(
       values[`${field.key}Id`] = Number(
         item.fields[`${field.key}LookupId`] ?? 0
       );
+
       values[field.key] = String(item.fields[field.key] ?? "");
       return;
     }
@@ -115,11 +65,21 @@ function normalizarItem(
   };
 }
 
+function getMaestroListId(config: MaestroConfig): string {
+  if (!config.listaId) {
+    throw new Error(
+      `El maestro ${config.key} no tiene listaId configurado en maestros.config.ts.`
+    );
+  }
+
+  return config.listaId;
+}
+
 export async function listarMaestro(
   config: MaestroConfig
 ): Promise<MaestroItem[]> {
-  const { siteId, listId } = await getListContext(config.listaSharePoint);
-
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = getMaestroListId(config);
   const selectFields = getSelectFields(config);
 
   let url =
@@ -175,7 +135,8 @@ export async function crearMaestro(
   config: MaestroConfig,
   data: MaestroFormData
 ): Promise<void> {
-  const { siteId, listId } = await getListContext(config.listaSharePoint);
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = getMaestroListId(config);
 
   await graphFetch(`${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items`, {
     method: "POST",
@@ -190,9 +151,8 @@ export async function actualizarMaestro(params: {
   itemId: string;
   data: MaestroFormData;
 }): Promise<void> {
-  const { siteId, listId } = await getListContext(
-    params.config.listaSharePoint
-  );
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = getMaestroListId(params.config);
 
   await graphFetch(
     `${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items/${params.itemId}/fields`,
@@ -208,9 +168,8 @@ export async function cambiarEstadoMaestro(params: {
   itemId: string;
   activoActual: boolean;
 }): Promise<void> {
-  const { siteId, listId } = await getListContext(
-    params.config.listaSharePoint
-  );
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = getMaestroListId(params.config);
 
   await graphFetch(
     `${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items/${params.itemId}/fields`,

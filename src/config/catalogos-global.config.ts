@@ -3,7 +3,8 @@ export type CatalogoGlobalKey =
   | "cargos"
   | "tiposEntidad"
   | "unidadesZonales"
-  | "mediosCoordinacion";
+  | "mediosCoordinacion"
+  | "modalidadContratacion";
 
 export type CatalogoGlobalConfig = {
   key: CatalogoGlobalKey;
@@ -40,6 +41,12 @@ export const catalogosGlobalConfig: CatalogoGlobalConfig[] = [
   {
     key: "mediosCoordinacion",
     listaSharePoint: "UZ_MedioCoordinacion",
+    campoTexto: "field_1",
+    campoActivo: "Activo",
+  },
+  {
+    key: "modalidadContratacion",
+    listaSharePoint: "UZ_ModalidadContratacion",
     campoTexto: "field_1",
     campoActivo: "Activo",
   },

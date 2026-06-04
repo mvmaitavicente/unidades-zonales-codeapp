@@ -51,6 +51,7 @@ const initialState: CatalogosGlobalState = {
   tiposEntidad: [],
   unidadesZonales: [],
   mediosCoordinacion: [],
+  modalidadContratacion: [],
 };
 
 export const CatalogosGlobalContext =

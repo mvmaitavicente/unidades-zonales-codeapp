@@ -1,11 +1,12 @@
 import type { MaestroConfig } from "../types/maestro.types";
+import { SHAREPOINT_CONFIG } from "./sharepoint.config";
 
 export const maestrosConfig: Record<string, MaestroConfig> = {
   autoridades: {
     key: "autoridades",
     titulo: "Autoridades",
     descripcion: "Administración de autoridades visitantes.",
-    listaSharePoint: "UZ_Autoridad",
+    listaId: SHAREPOINT_CONFIG.lists.autoridades,
     titleField: "Nombres",
     fields: [
       {
@@ -73,11 +74,11 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
     key: "personal",
     titulo: "Personal PRONIED",
     descripcion: "Administración del personal PRONIED.",
-    listaSharePoint: "UZ_Personal",
+    listaId: "UZ_Personal",
     titleField: "Nombres",
     fields: [
       {
-        key: "TipoDocIdentidad",
+        key: "IdTipoDocIdentidad",
         label: "Tipo de documento",
         type: "lookup",
         required: true,
@@ -107,7 +108,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         visibleInTable: true,
       },
       {
-        key: "UnidadZonal",
+        key: "IdUnidadZonal",
         label: "Unidad Zonal",
         type: "lookup",
         required: true,
@@ -115,7 +116,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         catalogoKey: "unidadesZonales",
       },
       {
-        key: "Cargo",
+        key: "IdCargo",
         label: "Cargo",
         type: "lookup",
         required: true,
@@ -123,40 +124,30 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         catalogoKey: "cargos",
       },
       {
-        key: "Correo",
-        label: "Correo",
+        key: "IdModalidadContratacion",
+        label: "Modalidad",
+        type: "lookup",
+        required: true,
+        visibleInTable: true,
+        catalogoKey: "modalidadContratacion",
+      },
+      {
+        key: "MontoRemuneracion",
+        label: "Remuneración",
+        type: "number",
+        required: true,
+        visibleInTable: true,
+      },
+      {
+        key: "CorreoInstitucional",
+        label: "Correo Institucional",
         type: "email",
         visibleInTable: true,
       },
       {
-        key: "Activo",
-        label: "Activo",
-        type: "boolean",
-        visibleInTable: true,
-      },
-    ],
-  },
-
-  entidades: {
-    key: "entidades",
-    titulo: "Entidades",
-    descripcion: "Administración de entidades.",
-    listaSharePoint: "UZ_Entidad",
-    titleField: "Descripcion",
-    fields: [
-      {
-        key: "TipoEntidad",
-        label: "Tipo de entidad",
-        type: "lookup",
-        required: true,
-        visibleInTable: true,
-        catalogoKey: "tiposEntidad",
-      },
-      {
-        key: "Descripcion",
-        label: "Entidad",
+        key: "NroCelular",
+        label: "Celular",
         type: "text",
-        required: true,
         visibleInTable: true,
       },
       {
@@ -167,4 +158,5 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
       },
     ],
   },
+  
 };

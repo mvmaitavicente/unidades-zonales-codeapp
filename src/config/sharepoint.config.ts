@@ -4,8 +4,7 @@ export const SHAREPOINT_CONFIG = {
 
   lists: {
     autoridades: "b96b1b32-fcee-48e8-af03-e545b36d62ec",
-    personal: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    entidades: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    personal: "bfb43e93-a366-47a6-a2ee-af0e857f6d3d",
 
     tipoDocumento: "7037c5ef-28cc-419e-b662-941680912165",
     cargo: "ac602911-b042-40b7-913c-6a79c89e1a9c",

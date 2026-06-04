@@ -22,7 +22,7 @@ export type MaestroConfig = {
   key: string;
   titulo: string;
   descripcion: string;
-  listaSharePoint: string;
+  listaId: string;
   titleField?: string;
   fields: MaestroFieldConfig[];
 };

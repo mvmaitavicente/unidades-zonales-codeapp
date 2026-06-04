@@ -142,15 +142,6 @@ export default function Sidebar({
                 {!collapsed && <span>Personal</span>}
               </NavLink>
 
-              <NavLink
-                to="/maestros/entidades"
-                className="nav-item nav-subitem"
-                title="Entidades"
-                onClick={closeMobileAfterClick}
-              >
-                <Users size={17} />
-                {!collapsed && <span>Entidades</span>}
-              </NavLink>
             </>
           )}
 
