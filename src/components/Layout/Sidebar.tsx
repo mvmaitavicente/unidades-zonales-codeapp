@@ -7,7 +7,6 @@ import {
   ClipboardEdit,
   Inbox,
   Database,
-  Users,
   Landmark,
   UserRound,
   LogOut,
@@ -209,6 +208,26 @@ export default function Sidebar({
               >
                 <Database size={16} />
                 {!collapsed && <span>Tipo Entidad</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/unidad-zonal"
+                className="nav-item nav-subitem"
+                title="Unidades Zonales"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Unidades Zonales</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/modalidad-contratacion"
+                className="nav-item nav-subitem"
+                title="Modalidad Contratación"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Modalidad Contratación</span>}
               </NavLink>
             </>
           )}

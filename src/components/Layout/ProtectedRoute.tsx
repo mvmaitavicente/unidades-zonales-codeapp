@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import ScrollToTop from "../Common/ScrollToTop";
 
 export default function ProtectedRoute() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -28,6 +29,7 @@ export default function ProtectedRoute() {
 
         <section className="page-container">
           <Outlet />
+          <ScrollToTop />
         </section>
       </main>
     </div>

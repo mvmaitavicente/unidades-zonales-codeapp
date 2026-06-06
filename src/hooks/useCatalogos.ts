@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CatalogoFormData, CatalogoItem } from "../types/catalogo.types";
+import type { CatalogoCampoExtra, CatalogoFormData, CatalogoItem } from "../types/catalogo.types";
 import {
   actualizarCatalogo,
   cambiarEstadoCatalogo,
@@ -7,31 +7,28 @@ import {
   listarCatalogo,
 } from "../services/catalogo.service";
 
-type UseCatalogosParams = {
+type Params = {
   siteId: string;
   listId: string;
   campoDescripcion: string;
+  camposExtra?: CatalogoCampoExtra[];
 };
 
-export function useCatalogos(params: UseCatalogosParams) {
+export function useCatalogos(params: Params) {
   const [items, setItems] = useState<CatalogoItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const cargar = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
-      setError("");
-
-      const data = await listarCatalogo({
-        siteId: params.siteId,
-        listId: params.listId,
-        campoDescripcion: params.campoDescripcion,
-      });
-
+      const data = await listarCatalogo(params);
       setItems(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido.");
+      console.error(err);
+      setError("No se pudieron cargar los registros.");
     } finally {
       setLoading(false);
     }

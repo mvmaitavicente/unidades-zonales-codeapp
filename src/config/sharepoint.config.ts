@@ -8,9 +8,10 @@ export const SHAREPOINT_CONFIG = {
 
     tipoDocumento: "7037c5ef-28cc-419e-b662-941680912165",
     cargo: "ac602911-b042-40b7-913c-6a79c89e1a9c",
-    carreraPersona: "866399e0-7191-4b74-aee6-0869bdb97fd3",
+    carreraPersonal: "866399e0-7191-4b74-aee6-0869bdb97fd3",
     tipoEntidad: "ea8f0b12-dcda-4645-b7ae-c9769bbce349",
     unidadZonal: "43c7915e-8f4c-4763-ad54-a4ddc8a2096a",
     medioCoordinacion: "4a7ff98c-6f32-4eea-a1a1-d18797762d3c",
+    modalidadContratacion: "cb24df6a-8d94-4504-8b05-b0ca5f68c3f6",
   },
 };

@@ -1072,11 +1072,12 @@
 }
 
 .maestro-toolbar {
-  display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto;
-  align-items: center;
-  gap: 18px;
-  padding: 24px 32px;
+  position: sticky;
+  top: 72px;
+  z-index: 50;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e5ebf3;
 }
 
 .maestro-search {
@@ -1313,5 +1314,443 @@
   .maestro-modal-header,
   .maestro-modal-body {
     padding: 20px;
+  }
+}
+
+.scroll-top-button {
+  position: fixed;
+  right: 26px;
+  bottom: 26px;
+  z-index: 1200;
+
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-top-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.42);
+}
+
+/* ================================
+   FIX LAYOUT GENERAL
+================================ */
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 286px 1fr;
+}
+
+.app-shell.sidebar-collapsed {
+  grid-template-columns: 78px 1fr;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+  overflow-y: auto;
+  z-index: 900;
+}
+
+.main-layout {
+  min-width: 0;
+  background: #f3f6fb;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 700;
+}
+
+/* ================================
+   MAESTROS - PANEL
+================================ */
+
+.maestro-panel {
+  background: #ffffff;
+  border: 1px solid #e5ebf3;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(15, 37, 68, 0.08);
+  overflow: visible;
+}
+
+.maestro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 28px 32px;
+  border-bottom: 1px solid #e5ebf3;
+  background: #ffffff;
+  border-radius: 18px 18px 0 0;
+}
+
+.maestro-header h1 {
+  margin: 0;
+  color: #0f2544;
+  font-size: 1.8rem;
+}
+
+.maestro-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+/* ================================
+   MAESTROS - TOOLBAR STICKY
+================================ */
+
+.maestro-toolbar {
+  position: sticky;
+  top: 74px;
+  z-index: 650;
+
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 220px auto;
+  align-items: center;
+  gap: 16px;
+
+  padding: 18px 32px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+
+  border-bottom: 1px solid #e5ebf3;
+  box-shadow: 0 8px 18px rgba(15, 37, 68, 0.06);
+}
+
+/* Buscador */
+.maestro-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 46px;
+  padding: 0 14px;
+
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.maestro-search svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.maestro-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-size: 0.92rem;
+  color: #0f2544;
+  font-family: inherit;
+}
+
+.maestro-search input::placeholder {
+  color: #94a3b8;
+}
+
+/* Filtro Estado */
+.maestro-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.maestro-filter label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f2544;
+}
+
+.maestro-filter select {
+  width: 150px;
+  height: 46px;
+
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+  background: #ffffff;
+
+  padding: 0 12px;
+  color: #0f2544;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* Botones */
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  padding: 0 20px;
+  font-weight: 800;
+  cursor: pointer;
+
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 46px;
+  border: 1px solid #d8e0ec;
+  border-radius: 14px;
+
+  background: #ffffff;
+  color: #0f2544;
+
+  padding: 0 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ================================
+   MAESTROS - TABLA
+================================ */
+
+.maestro-table-section {
+  padding: 24px 32px 28px;
+}
+
+.catalogo-table-card,
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.catalogo-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.catalogo-table th {
+  background: #f8fafc;
+  color: #0f2544;
+  font-weight: 800;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.catalogo-table td {
+  color: #0f2544;
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+.catalogo-table th,
+.catalogo-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e5ebf3;
+  text-align: left;
+}
+
+.catalogo-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.table-actions button {
+  border: 1px solid #d8e0ec;
+  border-radius: 8px;
+  background: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* ================================
+   PAGINACIÓN
+================================ */
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding-top: 18px;
+  margin-top: 14px;
+
+  border-top: 1px solid #e5ebf3;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pagination-actions button {
+  min-width: 40px;
+  height: 38px;
+
+  border: 1px solid #d8e0ec;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #0f2544;
+
+  padding: 0 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pagination-actions button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.pagination-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ================================
+   BOTÓN IR ARRIBA
+================================ */
+
+.scroll-top-button {
+  position: fixed;
+  right: 26px;
+  bottom: 26px;
+  z-index: 1200;
+
+  width: 52px;
+  height: 52px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-top-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.42);
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1023px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 78px 1fr;
+  }
+
+  .maestro-toolbar {
+    grid-template-columns: 1fr;
+    top: 74px;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -286px;
+    width: 286px;
+    height: 100vh;
+    z-index: 1001;
+    transition: left 0.25s ease;
+  }
+
+  .sidebar.mobile-open {
+    left: 0;
+  }
+
+  .maestro-header {
+    flex-direction: column;
+    padding: 22px 18px;
+  }
+
+  .maestro-toolbar {
+    grid-template-columns: 1fr;
+    top: 66px;
+    padding: 14px 18px;
+  }
+
+  .maestro-filter {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .maestro-filter select {
+    width: 100%;
+  }
+
+  .secondary-button,
+  .primary-button {
+    width: 100%;
+  }
+
+  .maestro-table-section {
+    padding: 18px;
+  }
+
+  .pagination-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scroll-top-button {
+    right: 18px;
+    bottom: 18px;
   }
 }
