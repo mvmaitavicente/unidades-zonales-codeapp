@@ -1,7 +1,23 @@
 import { getMsalRedirectUri, graphRequest } from "../authConfig";
 import { msalInstance } from "../msalInstance";
 
+let tokenPromise: Promise<string> | null = null;
+
 export async function getGraphToken(): Promise<string> {
+  if (tokenPromise) {
+    return tokenPromise;
+  }
+
+  tokenPromise = obtenerNuevoToken();
+
+  try {
+    return await tokenPromise;
+  } finally {
+    tokenPromise = null;
+  }
+}
+
+async function obtenerNuevoToken(): Promise<string> {
   const accounts = msalInstance.getAllAccounts();
 
   if (accounts.length === 0) {

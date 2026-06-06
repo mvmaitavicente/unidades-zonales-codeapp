@@ -11,10 +11,9 @@ import {
   catalogosGlobalConfig,
   type CatalogoGlobalKey,
 } from "../config/catalogos-global.config";
+import { SHAREPOINT_CONFIG } from "../config/sharepoint.config";
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
-const HOSTNAME = "proniedoti.sharepoint.com";
-const SITE_PATH = "/sites/OTI_PUBLICACION";
 
 export type LookupOption = {
   value: number;
@@ -28,14 +27,6 @@ type CatalogosGlobalContextValue = {
   loading: boolean;
   cargado: boolean;
   recargarCatalogos: () => Promise<void>;
-};
-
-type GraphSiteResponse = {
-  id: string;
-};
-
-type GraphListResponse = {
-  id: string;
 };
 
 type GraphListItemsResponse = {
@@ -57,47 +48,13 @@ const initialState: CatalogosGlobalState = {
 export const CatalogosGlobalContext =
   createContext<CatalogosGlobalContextValue | null>(null);
 
-const siteCache: Record<string, string> = {};
-const listCache: Record<string, string> = {};
-
-async function getSiteId(): Promise<string> {
-  const cacheKey = `${HOSTNAME}${SITE_PATH}`;
-
-  if (siteCache[cacheKey]) {
-    return siteCache[cacheKey];
-  }
-
-  const site = await graphFetch<GraphSiteResponse>(
-    `${GRAPH_BASE}/sites/${HOSTNAME}:${SITE_PATH}`
-  );
-
-  siteCache[cacheKey] = site.id;
-  return site.id;
-}
-
-async function getListId(listaSharePoint: string): Promise<string> {
-  const siteId = await getSiteId();
-  const cacheKey = `${siteId}_${listaSharePoint}`;
-
-  if (listCache[cacheKey]) {
-    return listCache[cacheKey];
-  }
-
-  const list = await graphFetch<GraphListResponse>(
-    `${GRAPH_BASE}/sites/${siteId}/lists/${listaSharePoint}`
-  );
-
-  listCache[cacheKey] = list.id;
-  return list.id;
-}
-
 async function listarOpcionesCatalogo(params: {
-  listaSharePoint: string;
+  listId: string;
   campoTexto: string;
   campoActivo?: string;
 }): Promise<LookupOption[]> {
-  const siteId = await getSiteId();
-  const listId = await getListId(params.listaSharePoint);
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = params.listId;
 
   const campos = [params.campoTexto];
 
@@ -144,7 +101,7 @@ export function CatalogosGlobalProvider({
       const entries = await Promise.all(
         catalogosGlobalConfig.map(async (config) => {
           const options = await listarOpcionesCatalogo({
-            listaSharePoint: config.listaSharePoint,
+            listId: config.listId,
             campoTexto: config.campoTexto,
             campoActivo: config.campoActivo,
           });
