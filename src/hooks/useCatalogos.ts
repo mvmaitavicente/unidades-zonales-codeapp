@@ -1,13 +1,15 @@
-
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CatalogoCampoExtra, CatalogoFormData, CatalogoItem } from "../types/catalogo.types";
+import type {
+  CatalogoCampoExtra,
+  CatalogoFormData,
+  CatalogoItem,
+} from "../types/catalogo.types";
 import {
   actualizarCatalogo,
   cambiarEstadoCatalogo,
   crearCatalogo,
   listarCatalogo,
 } from "../services/catalogo.service";
-
 
 type Params = {
   siteId: string;
@@ -21,7 +23,7 @@ export function useCatalogos(params: Params) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const yaCargoRef = useRef(false);
+  const ultimaCargaKeyRef = useRef("");
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -36,7 +38,12 @@ export function useCatalogos(params: Params) {
     } finally {
       setLoading(false);
     }
-  }, [params.siteId, params.listId, params.campoDescripcion]);
+  }, [
+    params.siteId,
+    params.listId,
+    params.campoDescripcion,
+    params.camposExtra,
+  ]);
 
   const guardar = async (data: CatalogoFormData) => {
     if (data.itemId) {
@@ -70,11 +77,13 @@ export function useCatalogos(params: Params) {
   };
 
   useEffect(() => {
-    if (yaCargoRef.current) return;
+    const key = `${params.siteId}_${params.listId}_${params.campoDescripcion}`;
 
-    yaCargoRef.current = true;
+    if (ultimaCargaKeyRef.current === key) return;
+
+    ultimaCargaKeyRef.current = key;
     cargar();
-  }, [cargar]);
+  }, [cargar, params.siteId, params.listId, params.campoDescripcion]);
 
   return {
     items,
