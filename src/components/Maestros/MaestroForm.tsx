@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type {
   MaestroConfig,
+  MaestroFieldConfig,
   MaestroFormData,
   MaestroItem,
 } from "../../types/maestro.types";
@@ -15,6 +16,17 @@ type Props = {
   onCancelar: () => void;
 };
 
+type CatalogoOptionExtra = LookupOption & {
+  extra?: Record<string, unknown>;
+};
+
+const soloNumeros = (value: string) => /^\d*$/.test(value);
+const decimal = (value: string) => /^\d*\.?\d*$/.test(value);
+
+function validarDominioCorreo(value: string, domain: string) {
+  return value.toLowerCase().endsWith(domain.toLowerCase());
+}
+
 export default function MaestroForm({
   config,
   itemEditando,
@@ -24,50 +36,146 @@ export default function MaestroForm({
   onCancelar,
 }: Props) {
   const [formData, setFormData] = useState<MaestroFormData>({});
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!itemEditando) {
-      const initialData: MaestroFormData = {};
-
-      config.fields.forEach((field) => {
-        if (field.type === "boolean") {
-          initialData[field.key] = true;
-        } else {
-          initialData[field.key] = "";
-        }
-      });
-
-      setFormData(initialData);
-      return;
-    }
-
-    const editData: MaestroFormData = {};
+    const data: MaestroFormData = {};
 
     config.fields.forEach((field) => {
-      if (field.type === "lookup") {
-        editData[field.key] = itemEditando.values[`${field.key}Id`] ?? "";
+      if (itemEditando) {
+        data[field.key] =
+          field.type === "lookup"
+            ? itemEditando.values[`${field.key}Id`] ?? ""
+            : itemEditando.values[field.key] ?? "";
       } else {
-        editData[field.key] = itemEditando.values[field.key] ?? "";
+        data[field.key] = field.type === "boolean" ? true : "";
       }
     });
 
-    setFormData(editData);
+    setFormData(data);
+    setError("");
   }, [config, itemEditando]);
 
-  const actualizarCampo = (key: string, value: unknown) => {
+  const obtenerOpcionCatalogo = (
+    field: MaestroFieldConfig
+  ): CatalogoOptionExtra | undefined => {
+    if (!field.catalogoKey) return undefined;
+
+    const value = formData[field.key];
+    const options = catalogos[field.catalogoKey] ?? [];
+
+    return options.find(
+      (option) => Number(option.value) === Number(value)
+    ) as CatalogoOptionExtra | undefined;
+  };
+
+  const obtenerReglaDocumento = (field: MaestroFieldConfig) => {
+    const sourceKey = field.validation?.dynamicDocumentFrom;
+    if (!sourceKey) return null;
+
+    const sourceField = config.fields.find((f) => f.key === sourceKey);
+    if (!sourceField) return null;
+
+    const option = obtenerOpcionCatalogo(sourceField);
+    if (!option) return null;
+
+    return {
+      minLength: Number(option.extra?.LongitudMinima ?? 0 ),
+      maxLength: Number(option.extra?.LongitudMaxima ?? 0 ),
+      onlyNumbers: Boolean(option.extra?.SoloNumeros),
+    };
+  };
+
+  const actualizarCampo = (field: MaestroFieldConfig, value: unknown) => {
+    setError("");
+
+    const textValue = String(value ?? "");
+    const validation = field.validation;
+    const documentoRule = obtenerReglaDocumento(field);
+
+    const onlyNumbers = validation?.onlyNumbers || documentoRule?.onlyNumbers;
+    const maxLength = validation?.maxLength ?? documentoRule?.maxLength;
+
+    if (onlyNumbers && !soloNumeros(textValue)) return;
+
+    if (validation?.decimal && !decimal(textValue)) return;
+
+    if (maxLength && textValue.length > maxLength) return;
+
     setFormData((prev) => ({
       ...prev,
-      [key]: value,
+      [field.key]: value,
     }));
+  };
+
+  const validarFormulario = (): boolean => {
+    for (const field of config.fields) {
+      const value = String(formData[field.key] ?? "").trim();
+      const validation = field.validation;
+      const documentoRule = obtenerReglaDocumento(field);
+
+      if (field.required && !value) {
+        setError(`El campo ${field.label} es obligatorio.`);
+        return false;
+      }
+
+      const minLength = validation?.minLength ?? documentoRule?.minLength;
+      const maxLength = validation?.maxLength ?? documentoRule?.maxLength;
+
+      if (value && minLength && value.length < minLength) {
+        setError(`El campo ${field.label} debe tener mínimo ${minLength} caracteres.`);
+        return false;
+      }
+
+      if (value && maxLength && value.length > maxLength) {
+        setError(`El campo ${field.label} debe tener máximo ${maxLength} caracteres.`);
+        return false;
+      }
+
+      if (
+        value &&
+        minLength &&
+        maxLength &&
+        minLength === maxLength &&
+        value.length !== maxLength
+      ) {
+        setError(`El campo ${field.label} debe tener exactamente ${maxLength} caracteres.`);
+        return false;
+      }
+
+      if (value && validation?.emailDomain) {
+        if (!validarDominioCorreo(value, validation.emailDomain)) {
+          setError(`El campo ${field.label} debe terminar en ${validation.emailDomain}.`);
+          return false;
+        }
+      }
+
+      if (
+        value &&
+        validation?.startsWith &&
+        !value.startsWith(validation.startsWith)
+      ) {
+        setError(`El campo ${field.label} debe empezar con ${validation.startsWith}.`);
+        return false;
+      }
+    }
+
+    setError("");
+    return true;
   };
 
   const guardar = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!validarFormulario()) return;
+
     await onGuardar(formData, itemEditando?.itemId);
   };
 
   return (
     <form className="maestro-form" onSubmit={guardar}>
+      {error && <div className="form-error">{error}</div>}
+
       <div className="maestro-form-grid">
         {config.fields.map((field) => {
           const value = formData[field.key] ?? "";
@@ -78,9 +186,7 @@ export default function MaestroForm({
                 <input
                   type="checkbox"
                   checked={Boolean(value)}
-                  onChange={(e) =>
-                    actualizarCampo(field.key, e.target.checked)
-                  }
+                  onChange={(e) => actualizarCampo(field, e.target.checked)}
                 />
                 {field.label}
               </label>
@@ -104,7 +210,10 @@ export default function MaestroForm({
                   value={String(value)}
                   required={field.required}
                   onChange={(e) =>
-                    actualizarCampo(field.key, Number(e.target.value))
+                    actualizarCampo(
+                      field,
+                      e.target.value ? Number(e.target.value) : ""
+                    )
                   }
                 >
                   <option value="">Seleccionar</option>
@@ -119,6 +228,10 @@ export default function MaestroForm({
             );
           }
 
+          const documentoRule = obtenerReglaDocumento(field);
+          const maxLength =
+            field.validation?.maxLength ?? documentoRule?.maxLength;
+
           return (
             <div key={field.key} className="form-field">
               <label>
@@ -130,9 +243,41 @@ export default function MaestroForm({
                 type={field.type === "email" ? "email" : "text"}
                 value={String(value)}
                 required={field.required}
-                maxLength={field.maxLength}
-                onChange={(e) => actualizarCampo(field.key, e.target.value)}
+                disabled={
+                  Boolean(field.validation?.dynamicDocumentFrom) &&
+                  !obtenerReglaDocumento(field)
+                }
+                placeholder={
+                  field.validation?.dynamicDocumentFrom && !obtenerReglaDocumento(field)
+                    ? "Seleccione primero el tipo de documento"
+                    : field.placeholder
+                }
+                maxLength={maxLength}
+                inputMode={
+                  field.validation?.onlyNumbers || documentoRule?.onlyNumbers
+                    ? "numeric"
+                    : field.validation?.decimal
+                    ? "decimal"
+                    : undefined
+                }
+                onChange={(e) => actualizarCampo(field, e.target.value)}
               />
+
+              {field.validation?.emailDomain &&
+                String(value).trim() &&
+                !validarDominioCorreo(String(value), field.validation.emailDomain) && (
+                  <small className="form-help-error">
+                    El correo debe terminar en {field.validation.emailDomain}
+                  </small>
+                )}
+
+              {field.validation?.startsWith &&
+                String(value).trim() &&
+                !String(value).startsWith(field.validation.startsWith) && (
+                  <small className="form-help-error">
+                    El celular debe empezar con {field.validation.startsWith}.
+                  </small>
+                )}
             </div>
           );
         })}

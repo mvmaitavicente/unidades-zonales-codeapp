@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -52,11 +53,15 @@ async function listarOpcionesCatalogo(params: {
   listId: string;
   campoTexto: string;
   campoActivo?: string;
+  camposExtra?: string[];
 }): Promise<LookupOption[]> {
   const siteId = SHAREPOINT_CONFIG.siteId;
   const listId = params.listId;
 
-  const campos = [params.campoTexto];
+  const campos = [
+    params.campoTexto,
+    ...(params.camposExtra ?? []),
+  ];
 
   if (params.campoActivo) {
     campos.push(params.campoActivo);
@@ -79,6 +84,10 @@ async function listarOpcionesCatalogo(params: {
     .map((item) => ({
       value: Number(item.id),
       label: String(item.fields[params.campoTexto] ?? ""),
+      extra: params.camposExtra?.reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = item.fields[key];
+        return acc;
+      }, {}),
     }))
     .filter((item) => item.label.trim() !== "")
     .sort((a, b) => a.label.localeCompare(b.label));
@@ -94,6 +103,8 @@ export function CatalogosGlobalProvider({
   const [loading, setLoading] = useState(false);
   const [cargado, setCargado] = useState(false);
 
+  const yaCargoRef = useRef(false);
+
   const recargarCatalogos = useCallback(async () => {
     setLoading(true);
 
@@ -104,6 +115,7 @@ export function CatalogosGlobalProvider({
             listId: config.listId,
             campoTexto: config.campoTexto,
             campoActivo: config.campoActivo,
+            camposExtra: config.camposExtra,
           });
 
           return [config.key, options] as const;
@@ -122,9 +134,11 @@ export function CatalogosGlobalProvider({
   }, []);
 
   useEffect(() => {
-    if (!cargado) {
-      recargarCatalogos();
-    }
+    if (cargado || yaCargoRef.current) return;
+
+    yaCargoRef.current = true;
+
+    recargarCatalogos();
   }, [cargado, recargarCatalogos]);
 
   const value = useMemo(

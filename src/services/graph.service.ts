@@ -1,4 +1,5 @@
-import { getMsalRedirectUri, graphRequest } from "../authConfig";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { graphRequest } from "../authConfig";
 import { msalInstance } from "../msalInstance";
 
 let tokenPromise: Promise<string> | null = null;
@@ -21,7 +22,7 @@ async function obtenerNuevoToken(): Promise<string> {
   const accounts = msalInstance.getAllAccounts();
 
   if (accounts.length === 0) {
-    throw new Error("No existe una cuenta autenticada.");
+    throw new Error("SESSION_EXPIRED");
   }
 
   try {
@@ -31,14 +32,12 @@ async function obtenerNuevoToken(): Promise<string> {
     });
 
     return response.accessToken;
-  } catch {
-    const response = await msalInstance.acquireTokenPopup({
-      ...graphRequest,
-      account: accounts[0],
-      redirectUri: getMsalRedirectUri(),
-    });
+  } catch (error) {
+    if (error instanceof InteractionRequiredAuthError) {
+      throw new Error("SESSION_EXPIRED");
+    }
 
-    return response.accessToken;
+    throw error;
   }
 }
 
@@ -46,25 +45,39 @@ export async function graphFetch<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = await getGraphToken();
+  try {
+    const token = await getGraphToken();
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-  });
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error Graph ${response.status}: ${errorText}`);
+    if (response.status === 401 || response.status === 403) {
+      throw new Error("SESSION_EXPIRED");
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error Graph ${response.status}: ${errorText}`);
+    }
+
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    return response.json() as Promise<T>;
+  } catch (error) {
+    if (error instanceof Error && error.message === "SESSION_EXPIRED") {
+      console.warn("Sesión expirada o requiere interacción.");
+      throw error;
+    }
+
+    console.error("Error en graphFetch:", error);
+    throw error;
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
 }

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CatalogoCampoExtra, CatalogoFormData, CatalogoItem } from "../types/catalogo.types";
 import {
   actualizarCatalogo,
@@ -6,6 +7,7 @@ import {
   crearCatalogo,
   listarCatalogo,
 } from "../services/catalogo.service";
+
 
 type Params = {
   siteId: string;
@@ -18,6 +20,8 @@ export function useCatalogos(params: Params) {
   const [items, setItems] = useState<CatalogoItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const yaCargoRef = useRef(false);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -66,6 +70,9 @@ export function useCatalogos(params: Params) {
   };
 
   useEffect(() => {
+    if (yaCargoRef.current) return;
+
+    yaCargoRef.current = true;
     cargar();
   }, [cargar]);
 

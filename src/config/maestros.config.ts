@@ -10,7 +10,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
     titleField: "Nombres",
     fields: [
       {
-        key: "TipoDocIdentidad",
+        key: "IdTipoDocIdentidad",
         label: "Tipo de documento",
         type: "lookup",
         required: true,
@@ -23,7 +23,10 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
-        maxLength: 8,
+        placeholder: "Ingrese Nro. documento",
+        validation: {
+          dynamicDocumentFrom: "IdTipoDocIdentidad",
+        },
       },
       {
         key: "Nombres",
@@ -74,7 +77,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
     key: "personal",
     titulo: "Personal PRONIED",
     descripcion: "Administración del personal PRONIED.",
-    listaId: "UZ_Personal",
+    listaId: SHAREPOINT_CONFIG.lists.personal,
     titleField: "Nombres",
     fields: [
       {
@@ -91,7 +94,10 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
-        maxLength: 8,
+        placeholder: "Ingrese Nro. documento",
+        validation: {
+          dynamicDocumentFrom: "IdTipoDocIdentidad",
+        },
       },
       {
         key: "Nombres",
@@ -137,18 +143,33 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "number",
         required: true,
         visibleInTable: true,
+        placeholder: "Ejemplo: 2500.00",
+        validation: {
+          decimal: true,
+        },
       },
       {
         key: "CorreoInstitucional",
         label: "Correo Institucional",
         type: "email",
         visibleInTable: true,
+        placeholder: "usuario@pronied.gob.pe",
+        validation: {
+          emailDomain: "@pronied.gob.pe",
+        },
       },
       {
         key: "NroCelular",
         label: "Celular",
         type: "text",
         visibleInTable: true,
+        placeholder: "987654321",
+        validation: {
+          onlyNumbers: true,
+          startsWith: "9",
+          minLength: 9,
+          maxLength: 9,
+        },
       },
       {
         key: "Activo",
