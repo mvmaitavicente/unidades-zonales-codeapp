@@ -7,7 +7,8 @@ export type TransaccionFieldType =
   | "number"
   | "date"
   | "url"
-  | "lookup";
+  | "lookup"
+  | "file";
 
 export type TransaccionFieldConfig = {
   key: string;
@@ -16,6 +17,7 @@ export type TransaccionFieldConfig = {
   required?: boolean;
   placeholder?: string;
   catalogoKey?: CatalogoGlobalKey;
+  section?: string;
 };
 
 export type TransaccionConfig = {
