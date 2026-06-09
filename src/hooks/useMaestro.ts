@@ -11,8 +11,6 @@ import {
   listarMaestro,
 } from "../services/maestro.service";
 
-const PAGE_SIZE = 20;
-
 type EstadoFiltro = "todos" | "activos" | "inactivos";
 
 export function useMaestro(config: MaestroConfig) {
@@ -23,6 +21,7 @@ export function useMaestro(config: MaestroConfig) {
   const [busqueda, setBusqueda] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltro>("todos");
   const [paginaActual, setPaginaActual] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -54,14 +53,14 @@ export function useMaestro(config: MaestroConfig) {
   }, [items, busqueda, estadoFiltro]);
 
   const totalRegistros = itemsFiltrados.length;
-  const totalPaginas = Math.max(1, Math.ceil(totalRegistros / PAGE_SIZE));
+  const totalPaginas = Math.max(1, Math.ceil(totalRegistros / pageSize));
 
   const itemsPaginados = useMemo(() => {
-    const inicio = (paginaActual - 1) * PAGE_SIZE;
-    const fin = inicio + PAGE_SIZE;
+    const inicio = (paginaActual - 1) * pageSize;
+    const fin = inicio + pageSize;
 
     return itemsFiltrados.slice(inicio, fin);
-  }, [itemsFiltrados, paginaActual]);
+  }, [itemsFiltrados, paginaActual, pageSize]);
 
   const cambiarBusqueda = (value: string) => {
     setBusqueda(value);
@@ -70,6 +69,11 @@ export function useMaestro(config: MaestroConfig) {
 
   const cambiarEstadoFiltro = (value: EstadoFiltro) => {
     setEstadoFiltro(value);
+    setPaginaActual(1);
+  };
+
+  const cambiarPageSize = (size: number) => {
+    setPageSize(size);
     setPaginaActual(1);
   };
 
@@ -139,7 +143,8 @@ export function useMaestro(config: MaestroConfig) {
     paginaActual,
     totalPaginas,
     totalRegistros,
-    pageSize: PAGE_SIZE,
+    pageSize,
+    cambiarPageSize,
     irPaginaAnterior,
     irPaginaSiguiente,
     irAPagina,

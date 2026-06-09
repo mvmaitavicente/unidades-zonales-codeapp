@@ -38,20 +38,25 @@ export function useTransacciones(config: TransaccionConfig) {
 
   const guardar = async (
     data: TransaccionFormData,
-    itemId?: string
+    itemId?: string,
+    options?: { recargar?: boolean }
   ): Promise<string> => {
     setSaving(true);
     setError("");
 
     try {
+      let codigo = "";
+
       if (itemId) {
         await actualizarTransaccion({ config, itemId, data });
-        await cargar();
-        return "";
+      } else {
+        codigo = await crearTransaccion(config, data);
       }
 
-      const codigo = await crearTransaccion(config, data);
-      await cargar();
+      if (options?.recargar !== false) {
+        await cargar();
+      }
+
       return codigo;
     } catch (err) {
       console.error(err);

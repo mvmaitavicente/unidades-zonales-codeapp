@@ -12,9 +12,9 @@ export type MaestroFieldValidation = {
   decimal?: boolean;
   minLength?: number;
   maxLength?: number;
+  startsWith?: string;
   emailDomain?: string;
   dynamicDocumentFrom?: string;
-  startsWith?: string;
 };
 
 export type MaestroFieldConfig = {
@@ -23,9 +23,9 @@ export type MaestroFieldConfig = {
   type: MaestroFieldType;
   required?: boolean;
   visibleInTable?: boolean;
+  visibleInDetail?: boolean;
   placeholder?: string;
-  validation?:MaestroFieldValidation;
-
+  validation?: MaestroFieldValidation;
   catalogoKey?: CatalogoGlobalKey;
 };
 

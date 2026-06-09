@@ -1,8 +1,10 @@
+import { Check, Eye, Pencil, X } from "lucide-react";
 import type { MaestroConfig, MaestroItem } from "../../types/maestro.types";
 
 type Props = {
   config: MaestroConfig;
   items: MaestroItem[];
+  onViewDetail: (item: MaestroItem) => void;
   onEdit: (item: MaestroItem) => void;
   onToggleEstado: (item: MaestroItem) => void;
 };
@@ -10,6 +12,7 @@ type Props = {
 export default function MaestroTable({
   config,
   items,
+  onViewDetail,
   onEdit,
   onToggleEstado,
 }: Props) {
@@ -23,7 +26,7 @@ export default function MaestroTable({
             {visibleFields.map((field) => (
               <th key={field.key}>{field.label}</th>
             ))}
-            <th>Acciones</th>
+            <th className="actions-column">Acciones</th>
           </tr>
         </thead>
 
@@ -33,27 +36,54 @@ export default function MaestroTable({
               {visibleFields.map((field) => {
                 const value = item.values[field.key];
 
-                return (
-                  <td key={field.key}>
-                    {field.type === "boolean"
-                      ? Boolean(value)
-                        ? "Activo"
-                        : "Inactivo"
-                      : String(value ?? "")}
-                  </td>
-                );
+                if (field.type === "boolean") {
+                  return (
+                    <td key={field.key}>
+                      <span
+                        className={
+                          Boolean(value) ? "status active" : "status inactive"
+                        }
+                      >
+                        {Boolean(value) ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                  );
+                }
+
+                return <td key={field.key}>{String(value ?? "")}</td>;
               })}
 
-              <td>
-                <div className="table-actions">
-                  <button type="button" onClick={() => onEdit(item)}>
-                    Editar
-                  </button>
+              <td className="actions-column">
+                <button
+                  className="icon-action"
+                  type="button"
+                  title="Ver detalle"
+                  onClick={() => onViewDetail(item)}
+                >
+                  <Eye size={16} />
+                </button>
 
-                  <button type="button" onClick={() => onToggleEstado(item)}>
-                    {Boolean(item.values.Activo) ? "Inactivar" : "Activar"}
-                  </button>
-                </div>
+                <button
+                  className="icon-action"
+                  type="button"
+                  title="Editar"
+                  onClick={() => onEdit(item)}
+                >
+                  <Pencil size={16} />
+                </button>
+
+                <button
+                  className="icon-action"
+                  type="button"
+                  title={Boolean(item.values.Activo) ? "Inactivar" : "Activar"}
+                  onClick={() => onToggleEstado(item)}
+                >
+                  {Boolean(item.values.Activo) ? (
+                    <X size={16} />
+                  ) : (
+                    <Check size={16} />
+                  )}
+                </button>
               </td>
             </tr>
           ))}

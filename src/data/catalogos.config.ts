@@ -7,7 +7,7 @@ export const catalogosConfig = {
     siteId: SHAREPOINT_CONFIG.siteId,
     listId: SHAREPOINT_CONFIG.lists.tipoDocumento,
     campoDescripcion: "field_1",
-    labelDescripcion: "Tipo de documento",
+    labelDescripcion: "Tipo documento",
     camposExtra: [],
   },
 

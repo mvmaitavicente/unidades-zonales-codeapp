@@ -11,7 +11,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
     fields: [
       {
         key: "IdTipoDocIdentidad",
-        label: "Tipo de documento",
+        label: "Tipo Doc.",
         type: "lookup",
         required: true,
         visibleInTable: true,
@@ -19,7 +19,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
       },
       {
         key: "NroDocumentoIdentidad",
-        label: "Nro. documento",
+        label: "Nro. Doc.",
         type: "text",
         required: true,
         visibleInTable: true,
@@ -58,7 +58,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
       },
       {
         key: "TipoEntidad",
-        label: "Tipo de entidad",
+        label: "Tipo entidad",
         type: "lookup",
         required: true,
         visibleInTable: true,
@@ -82,7 +82,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
     fields: [
       {
         key: "IdTipoDocIdentidad",
-        label: "Tipo de documento",
+        label: "Tipo Doc.",
         type: "lookup",
         required: true,
         visibleInTable: true,
@@ -90,7 +90,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
       },
       {
         key: "NroDocumentoIdentidad",
-        label: "Nro. documento",
+        label: "Nro. Doc.",
         type: "text",
         required: true,
         visibleInTable: true,
@@ -142,7 +142,8 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         label: "Remuneración",
         type: "number",
         required: true,
-        visibleInTable: true,
+        visibleInTable: false,
+        visibleInDetail: true,
         placeholder: "Ejemplo: 2500.00",
         validation: {
           decimal: true,
@@ -152,7 +153,8 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         key: "CorreoInstitucional",
         label: "Correo Institucional",
         type: "email",
-        visibleInTable: true,
+        visibleInTable: false,
+        visibleInDetail: true,
         placeholder: "usuario@pronied.gob.pe",
         validation: {
           emailDomain: "@pronied.gob.pe",
@@ -162,7 +164,8 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         key: "NroCelular",
         label: "Celular",
         type: "text",
-        visibleInTable: true,
+        visibleInTable: false,
+        visibleInDetail: true,
         placeholder: "987654321",
         validation: {
           onlyNumbers: true,

@@ -36,7 +36,9 @@ export default function CatalogosAdminPage() {
     const texto = busqueda.toLowerCase();
 
     return items.filter((item) => {
-      const valoresExtra = Object.values(item.extra ?? {}).join(" ").toLowerCase();
+      const valoresExtra = Object.values(item.extra ?? {})
+        .join(" ")
+        .toLowerCase();
 
       return (
         item.descripcion.toLowerCase().includes(texto) ||
@@ -76,6 +78,10 @@ export default function CatalogosAdminPage() {
     }));
   };
 
+  const limpiarFiltros = () => {
+    setBusqueda("");
+  };
+
   const guardarRegistro = async () => {
     const data: CatalogoFormData = {
       itemId: itemEditando?.itemId,
@@ -96,22 +102,22 @@ export default function CatalogosAdminPage() {
   const totalColumnas = 4 + config.camposExtra.length;
 
   return (
-    <div className="page">
-      <div className="catalogo-header">
-        <div>
-          <h1>{config.titulo}</h1>
-          <p>Administración de la lista {config.listaSharePoint}.</p>
+    <div className="page-content">
+      <div className="maestro-panel">
+        <div className="maestro-header">
+          <div>
+            <h1>{config.titulo}</h1>
+            <p>Administración de la lista {config.listaSharePoint}.</p>
+          </div>
+
+          <button className="primary-button" onClick={abrirNuevo} type="button">
+            <Plus size={18} />
+            Nuevo registro
+          </button>
         </div>
 
-        <button className="primary-button" onClick={abrirNuevo} type="button">
-          <Plus size={18} />
-          Nuevo registro
-        </button>
-      </div>
-
-      <div className="catalogo-card">
-        <div className="catalogo-toolbar">
-          <div className="search-box">
+        <div className="maestro-toolbar">
+          <div className="maestro-search">
             <Search size={18} />
             <input
               value={busqueda}
@@ -119,6 +125,15 @@ export default function CatalogosAdminPage() {
               placeholder={`Buscar en ${config.titulo.toLowerCase()}...`}
             />
           </div>
+
+          <button
+            className="secondary-button"
+            onClick={limpiarFiltros}
+            type="button"
+          >
+            <X size={17} />
+            Limpiar filtros
+          </button>
 
           <button className="secondary-button" onClick={cargar} type="button">
             <RefreshCcw size={17} />
@@ -128,71 +143,77 @@ export default function CatalogosAdminPage() {
 
         {error && <div className="catalogo-error">{error}</div>}
 
-        <div className="table-wrapper">
-          <table className="catalogo-table">
-            <thead>
-              <tr>
-                <th className="index-column">#</th>
-                <th>{config.labelDescripcion ?? "Descripción"}</th>
-
-                {config.camposExtra.map((campo) => (
-                  <th key={campo.key}>{campo.label}</th>
-                ))}
-
-                <th>Activo</th>
-                <th className="actions-column">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {loading ? (
+        <div className="maestro-table-section">
+          <div className="catalogo-table-card">
+            <table className="catalogo-table">
+              <thead>
                 <tr>
-                  <td colSpan={totalColumnas}>Cargando registros...</td>
+                  <th className="index-column">#</th>
+                  <th>{config.labelDescripcion ?? "Descripción"}</th>
+
+                  {config.camposExtra.map((campo) => (
+                    <th key={campo.key}>{campo.label}</th>
+                  ))}
+
+                  <th>Activo</th>
+                  <th className="actions-column">Acciones</th>
                 </tr>
-              ) : itemsFiltrados.length === 0 ? (
-                <tr>
-                  <td colSpan={totalColumnas}>No se encontraron registros.</td>
-                </tr>
-              ) : (
-                itemsFiltrados.map((item, index) => (
-                  <tr key={item.itemId}>
-                    <td className="index-column">{index + 1}</td>
-                    <td>{item.descripcion}</td>
+              </thead>
 
-                    {config.camposExtra.map((campo) => (
-                      <td key={campo.key}>{String(item.extra?.[campo.key] ?? "")}</td>
-                    ))}
-
-                    <td>
-                      <span className={item.activo ? "status active" : "status inactive"}>
-                        {item.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-
-                    <td className="actions-column">
-                      <button
-                        className="icon-action"
-                        onClick={() => abrirEditar(item)}
-                        title="Editar"
-                        type="button"
-                      >
-                        <Pencil size={16} />
-                      </button>
-
-                      <button
-                        className="icon-action"
-                        onClick={() => cambiarEstado(item.itemId, item.activo)}
-                        title={item.activo ? "Inactivar" : "Activar"}
-                        type="button"
-                      >
-                        {item.activo ? <X size={16} /> : <Check size={16} />}
-                      </button>
-                    </td>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={totalColumnas}>Cargando registros...</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : itemsFiltrados.length === 0 ? (
+                  <tr>
+                    <td colSpan={totalColumnas}>No se encontraron registros.</td>
+                  </tr>
+                ) : (
+                  itemsFiltrados.map((item, index) => (
+                    <tr key={item.itemId}>
+                      <td className="index-column">{index + 1}</td>
+                      <td>{item.descripcion}</td>
+
+                      {config.camposExtra.map((campo) => (
+                        <td key={campo.key}>
+                          {String(item.extra?.[campo.key] ?? "")}
+                        </td>
+                      ))}
+
+                      <td>
+                        <span
+                          className={item.activo ? "status active" : "status inactive"}
+                        >
+                          {item.activo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+
+                      <td className="actions-column">
+                        <button
+                          className="icon-action"
+                          onClick={() => abrirEditar(item)}
+                          title="Editar"
+                          type="button"
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        <button
+                          className="icon-action"
+                          onClick={() => cambiarEstado(item.itemId, item.activo)}
+                          title={item.activo ? "Inactivar" : "Activar"}
+                          type="button"
+                        >
+                          {item.activo ? <X size={16} /> : <Check size={16} />}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -216,7 +237,9 @@ export default function CatalogosAdminPage() {
                 <input
                   value={descripcion}
                   onChange={(e) => setDescripcion(e.target.value)}
-                  placeholder={`Ingrese ${config.labelDescripcion?.toLowerCase() ?? "la descripción"}`}
+                  placeholder={`Ingrese ${
+                    config.labelDescripcion?.toLowerCase() ?? "la descripción"
+                  }`}
                 />
               </label>
 
@@ -243,11 +266,19 @@ export default function CatalogosAdminPage() {
             </div>
 
             <div className="drawer-footer">
-              <button className="secondary-button" onClick={cerrarModal} type="button">
+              <button
+                className="secondary-button"
+                onClick={cerrarModal}
+                type="button"
+              >
                 Cancelar
               </button>
 
-              <button className="primary-button" onClick={guardarRegistro} type="button">
+              <button
+                className="primary-button"
+                onClick={guardarRegistro}
+                type="button"
+              >
                 Guardar
               </button>
             </div>

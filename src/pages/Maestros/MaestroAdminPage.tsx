@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, RotateCcw, Search } from "lucide-react";
+import { Plus, RefreshCcw, Search, X } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 import { maestrosConfig } from "../../config/maestros.config";
@@ -50,16 +50,19 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
     totalPaginas,
     totalRegistros,
     pageSize,
+    cambiarPageSize,
     irPaginaAnterior,
     irPaginaSiguiente,
     irAPagina,
 
+    cargar,
     guardar,
     cambiarEstado,
   } = useMaestro(config);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [itemEditando, setItemEditando] = useState<MaestroItem | null>(null);
+  const [itemDetalle, setItemDetalle] = useState<MaestroItem | null>(null);
 
   const nuevoRegistro = () => {
     setItemEditando(null);
@@ -69,6 +72,10 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
   const editarRegistro = (item: MaestroItem) => {
     setItemEditando(item);
     setMostrarFormulario(true);
+  };
+
+  const verDetalle = (item: MaestroItem) => {
+    setItemDetalle(item);
   };
 
   const cerrarModal = () => {
@@ -90,6 +97,8 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
       : Math.min((paginaActual - 1) * pageSize + 1, totalRegistros);
 
   const hasta = Math.min(paginaActual * pageSize, totalRegistros);
+
+  const detailFields = config.fields.filter((field) => field.visibleInDetail);
 
   return (
     <div className="page-content">
@@ -142,8 +151,13 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
             type="button"
             onClick={limpiarFiltros}
           >
-            <RotateCcw size={17} />
+            <X size={17} />
             Limpiar filtros
+          </button>
+
+          <button className="secondary-button" type="button" onClick={cargar}>
+            <RefreshCcw size={17} />
+            Actualizar
           </button>
         </div>
 
@@ -152,9 +166,25 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
             <p>Cargando registros...</p>
           ) : (
             <>
+              <div className="page-size-selector">
+                <span>Mostrar</span>
+
+                <select
+                  value={pageSize}
+                  onChange={(e) => cambiarPageSize(Number(e.target.value))}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+
+                <span>registros</span>
+              </div>
+
               <MaestroTable
                 config={config}
                 items={itemsPaginados}
+                onViewDetail={verDetalle}
                 onEdit={editarRegistro}
                 onToggleEstado={cambiarEstado}
               />
@@ -223,6 +253,27 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
               onGuardar={guardarRegistro}
               onCancelar={cerrarModal}
             />
+          )}
+        </MaestroModal>
+      )}
+
+      {itemDetalle && (
+        <MaestroModal
+          title="Detalle del registro"
+          subtitle="Información complementaria del registro seleccionado."
+          onClose={() => setItemDetalle(null)}
+        >
+          {detailFields.length === 0 ? (
+            <p>No hay campos adicionales configurados para este registro.</p>
+          ) : (
+            <div className="detail-grid">
+              {detailFields.map((field) => (
+                <div className="detail-item" key={field.key}>
+                  <span>{field.label}</span>
+                  <strong>{String(itemDetalle.values[field.key] ?? "-")}</strong>
+                </div>
+              ))}
+            </div>
           )}
         </MaestroModal>
       )}
