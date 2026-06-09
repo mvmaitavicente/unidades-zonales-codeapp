@@ -3,6 +3,8 @@ export const SHAREPOINT_CONFIG = {
     "proniedoti.sharepoint.com,24c388e8-793d-47b7-8687-18028d6663f7,9939e5bc-b700-4b5d-a796-67bd4da3a462",
 
   lists: {
+    visitaAutoridades: "61d65e35-a870-40db-8cb0-b8652ca1c708",
+    
     autoridades: "b96b1b32-fcee-48e8-af03-e545b36d62ec",
     personal: "bfb43e93-a366-47a6-a2ee-af0e857f6d3d",
 
