@@ -10,23 +10,9 @@ export const transaccionesConfig: Record<string, TransaccionConfig> = {
     titleField: "Asunto",
     codigoField: "CodigoVisita",
     fields: [
-      {
-        key: "Asunto",
-        label: "Asunto",
-        type: "text",
-        required: true,
-      },
-      {
-        key: "Detalle",
-        label: "Detalle",
-        type: "textarea",
-        required: true,
-      },
-      {
-        key: "Observacion",
-        label: "Observación",
-        type: "textarea",
-      },
+      { key: "Asunto", label: "Asunto", type: "text", required: true },
+      { key: "Detalle", label: "Detalle", type: "textarea", required: true },
+      { key: "Observacion", label: "Observación", type: "textarea" },
       {
         key: "MedioCoordinacion",
         label: "Medio de coordinación",
@@ -34,35 +20,21 @@ export const transaccionesConfig: Record<string, TransaccionConfig> = {
         required: true,
         catalogoKey: "mediosCoordinacion",
       },
-      {
-        key: "FechaInicio",
-        label: "Fecha inicio",
-        type: "date",
-        required: true,
-      },
-      {
-        key: "FechaFin",
-        label: "Fecha fin",
-        type: "date",
-      },
-      {
-        key: "TipoDocIdentidadRepresentante",
-        label: "Tipo doc. representante",
-        type: "lookup",
-        required: true,
-        catalogoKey: "tiposDocumento",
-      },
-      {
-        key: "DocIdentidadRepresentante",
-        label: "Documento representante",
-        type: "text",
-        required: true,
-      },
+      { key: "FechaInicio", label: "Fecha inicio", type: "date", required: true },
+      { key: "FechaFin", label: "Fecha fin", type: "date" },
+
+      { key: "CodigoLocal", label: "Código local", type: "text", required: true },
+      { key: "NombreIE", label: "Nombre de la Institución Educativa", type: "text" },
+      { key: "NombreUGEL", label: "UGEL", type: "text" },
+      { key: "Region", label: "Región", type: "text" },
+      { key: "Provincia", label: "Provincia", type: "text" },
+      { key: "Distrito", label: "Distrito", type: "text" },
+      { key: "DireccionIE", label: "Dirección", type: "text" },
+
       {
         key: "TipoDocIdentidadAutoridad",
         label: "Tipo doc. autoridad",
         type: "lookup",
-        required: true,
         catalogoKey: "tiposDocumento",
       },
       {
@@ -71,21 +43,32 @@ export const transaccionesConfig: Record<string, TransaccionConfig> = {
         type: "text",
         required: true,
       },
+      { key: "NombresAutoridad", label: "Nombres autoridad", type: "text" },
+      { key: "ApellidosAutoridad", label: "Apellidos autoridad", type: "text" },
+      { key: "EntidadAutoridad", label: "Tipo entidad autoridad", type: "text" },
+      { key: "CargoAutoridad", label: "Cargo autoridad", type: "text" },
+      { key: "CorreoAutoridad", label: "Correo autoridad", type: "email" },
+
       {
-        key: "CodigoLocal",
-        label: "Código local",
+        key: "TipoDocIdentidadRepresentante",
+        label: "Tipo doc. representante",
+        type: "lookup",
+        catalogoKey: "tiposDocumento",
+      },
+      {
+        key: "DocIdentidadRepresentante",
+        label: "Documento representante",
         type: "text",
+        required: true,
       },
-      {
-        key: "LinkInforme",
-        label: "Link informe",
-        type: "url",
-      },
-      {
-        key: "NroExpedienteSGD",
-        label: "Nro. expediente SGD",
-        type: "text",
-      },
+      { key: "NombresRepresentante", label: "Nombres representante", type: "text" },
+      { key: "ApellidosRepresentante", label: "Apellidos representante", type: "text" },
+      { key: "UnidadZonalRepresentante", label: "Unidad Zonal representante", type: "text" },
+      { key: "CargoRepresentante", label: "Cargo representante", type: "text" },
+      { key: "CorreoRepresentante", label: "Correo representante", type: "email" },
+
+      { key: "LinkInforme", label: "Link informe", type: "url" },
+      { key: "NroExpedienteSGD", label: "Nro. expediente SGD", type: "text" },
     ],
   },
 };

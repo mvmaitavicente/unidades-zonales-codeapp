@@ -1,6 +1,5 @@
 import { Eye, Pencil, RefreshCcw, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import TransaccionForm from "../components/transacciones/TransaccionForm";
 import { transaccionesConfig } from "../config/transacciones.config";
 import { useCatalogosGlobal } from "../hooks/useCatalogosGlobal";
@@ -11,7 +10,6 @@ import type { TransaccionItem } from "../types/transaccion.types";
 const PAGE_SIZE_DEFAULT = 20;
 
 export default function BandejaVisitasPage() {
-  const navigate = useNavigate();
   const { catalogos } = useCatalogosGlobal();
   const config = transaccionesConfig.visitaAutoridades;
 
@@ -106,7 +104,9 @@ export default function BandejaVisitasPage() {
           <button
             type="button"
             className="primary-button"
-            onClick={() => navigate("/registro-visitas")}
+            onClick={() => {
+              window.location.hash = "/registro-visitas";
+            }}
           >
             + Nueva visita
           </button>

@@ -140,6 +140,7 @@ export default function Sidebar({
                 <UserRound size={17} />
                 {!collapsed && <span>Personal</span>}
               </NavLink>
+
             </>
           )}
 
@@ -158,15 +159,77 @@ export default function Sidebar({
           )}
 
           {(collapsed || catalogosOpen) && (
-            <NavLink
-              to="/administracion/catalogos"
-              className="nav-item nav-subitem"
-              title="Catálogos Globales"
-              onClick={closeMobileAfterClick}
-            >
-              <Database size={16} />
-              {!collapsed && <span>Catálogos Globales</span>}
-            </NavLink>
+            <>
+              <NavLink
+                to="/administracion/catalogos/tipo-documento-identidad"
+                className="nav-item nav-subitem"
+                title="Tipo Documento"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Tipo Documento</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/cargo"
+                className="nav-item nav-subitem"
+                title="Cargo"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Cargo</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/carrera-personal"
+                className="nav-item nav-subitem"
+                title="Carrera Personal"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Carrera Personal</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/medio-coordinacion"
+                className="nav-item nav-subitem"
+                title="Medio Coordinación"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Medio Coordinación</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/tipo-entidad"
+                className="nav-item nav-subitem"
+                title="Tipo Entidad"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Tipo Entidad</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/unidad-zonal"
+                className="nav-item nav-subitem"
+                title="Unidades Zonales"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Unidades Zonales</span>}
+              </NavLink>
+
+              <NavLink
+                to="/administracion/catalogos/modalidad-contratacion"
+                className="nav-item nav-subitem"
+                title="Modalidad Contratación"
+                onClick={closeMobileAfterClick}
+              >
+                <Database size={16} />
+                {!collapsed && <span>Modalidad Contratación</span>}
+              </NavLink>
+            </>
           )}
         </nav>
       </div>
