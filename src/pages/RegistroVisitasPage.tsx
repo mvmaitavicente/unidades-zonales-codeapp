@@ -87,6 +87,34 @@ export default function RegistroVisitasPage() {
     null
   );
 
+  /* Lógica 1 */
+
+  const [codigoLocalBusqueda, setCodigoLocalBusqueda] = useState("");
+  const [docAutoridadBusqueda, setDocAutoridadBusqueda] = useState("");
+  const [docRepresentanteBusqueda, setDocRepresentanteBusqueda] = useState("");
+
+  const soloNumeros = (value: string) => /^\d*$/.test(value);
+
+  const cambiarCodigoLocalBusqueda = (value: string) => {
+    if (soloNumeros(value) && value.length <= 6) {
+      setCodigoLocalBusqueda(value);
+    }
+  };
+
+  const cambiarDocAutoridadBusqueda = (value: string) => {
+    if (soloNumeros(value) && value.length <= 8) {
+      setDocAutoridadBusqueda(value);
+    }
+  };
+
+  const cambiarDocRepresentanteBusqueda = (value: string) => {
+    if (soloNumeros(value) && value.length <= 8) {
+      setDocRepresentanteBusqueda(value);
+    }
+  };
+
+  /* Fin Lógica 1 */
+
   const actualizarCampo = (key: string, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
@@ -101,6 +129,7 @@ export default function RegistroVisitasPage() {
   };
 
   const limpiarLocalEscolar = () => {
+    setCodigoLocalBusqueda("");
     setFormData((prev) => ({
       ...prev,
       CodigoLocal: "",
@@ -114,6 +143,7 @@ export default function RegistroVisitasPage() {
   };
 
   const limpiarAutoridad = () => {
+    setDocAutoridadBusqueda("");
     setFormData((prev) => ({
       ...prev,
       TipoDocIdentidadAutoridad: "",
@@ -127,6 +157,7 @@ export default function RegistroVisitasPage() {
   };
 
   const limpiarRepresentante = () => {
+    setDocRepresentanteBusqueda("");
     setFormData((prev) => ({
       ...prev,
       TipoDocIdentidadRepresentante: "",
@@ -154,13 +185,15 @@ export default function RegistroVisitasPage() {
     setModalLocalOpen(false);
   };
 
+  /* Inicio Función BuscarCodigoLocal */
+
   const buscarCodigoLocal = async () => {
     setError("");
 
-    const codigoLocal = String(formData.CodigoLocal ?? "").trim();
+    const codigoLocal = codigoLocalBusqueda.trim();
 
-    if (!codigoLocal) {
-      setError("Ingrese el código local.");
+    if (codigoLocal.length !== 6) {
+      setError("El código local debe tener exactamente 6 números.");
       return;
     }
 
@@ -178,6 +211,8 @@ export default function RegistroVisitasPage() {
 
     aplicarLocalEscolar(local);
   };
+
+  /* Fin Función BuscarCodigoLocal */
 
   const aplicarRepresentante = (
     persona: Awaited<ReturnType<typeof buscarMaestroPorDocumento>>,
@@ -199,13 +234,15 @@ export default function RegistroVisitasPage() {
     }));
   };
 
+  /* Inicio Buscar Representante */
+
   const buscarRepresentante = async () => {
     setError("");
 
-    const nroDocumento = String(formData.DocIdentidadRepresentante ?? "").trim();
+    const nroDocumento = docRepresentanteBusqueda.trim();
 
-    if (!nroDocumento) {
-      setError("Ingrese el documento del representante PRONIED.");
+    if (nroDocumento.length !== 8) {
+      setError("El documento del representante PRONIED debe tener exactamente 8 números.");
       return;
     }
 
@@ -221,6 +258,8 @@ export default function RegistroVisitasPage() {
 
     aplicarRepresentante(persona, nroDocumento);
   };
+
+  /* Fin Buscar Representante */
 
   const aplicarAutoridad = (
     autoridad: Awaited<ReturnType<typeof buscarMaestroPorDocumento>>,
@@ -245,13 +284,15 @@ export default function RegistroVisitasPage() {
     }));
   };
 
+  /* Inicio BuscarAutoridad */
+
   const buscarAutoridad = async () => {
     setError("");
 
-    const nroDocumento = String(formData.DocIdentidadAutoridad ?? "").trim();
+    const nroDocumento = docAutoridadBusqueda.trim();
 
-    if (!nroDocumento) {
-      setError("Ingrese el documento de la autoridad.");
+    if (nroDocumento.length !== 8) {
+      setError("El documento de la autoridad debe tener exactamente 8 números.");
       return;
     }
 
@@ -267,6 +308,8 @@ export default function RegistroVisitasPage() {
 
     aplicarAutoridad(autoridad, nroDocumento);
   };
+
+   /* Fin BuscarAutoridad */ 
 
   const onCreatedMaestro = async (nroDocumento: string) => {
     if (modalCrear === "personal") {
@@ -486,9 +529,11 @@ export default function RegistroVisitasPage() {
             <div className="form-field">
               <label>Código Local *</label>
               <input
-                value={String(formData.CodigoLocal ?? "")}
-                placeholder="Ejemplo: 818553"
-                onChange={(e) => actualizarCampo("CodigoLocal", e.target.value)}
+                value={codigoLocalBusqueda}
+                placeholder="Ingresar Código Local - 6 digitos"
+                inputMode="numeric"
+                maxLength={6}
+                onChange={(e) => cambiarCodigoLocalBusqueda(e.target.value)}
               />
             </div>
 
@@ -532,6 +577,11 @@ export default function RegistroVisitasPage() {
           </div>
 
         <div className="registro-form-grid colegio-info-grid">
+          <div className="form-field colegio-codigo">
+            <label>Código Local</label>
+            <input value={String(formData.CodigoLocal ?? "")} disabled readOnly />
+          </div>
+
           <div className="form-field colegio-nombre">
             <label>Nombre Institución Educativa</label>
             <input value={String(formData.NombreIE ?? "")} disabled readOnly />
@@ -577,13 +627,13 @@ export default function RegistroVisitasPage() {
 
           <div className="registro-form-grid cols-4">
             <div className="form-field">
-              <label>Nro. Documento *</label>
+              <label>Nro. DNI *</label>
               <input
-                value={String(formData.DocIdentidadAutoridad ?? "")}
-                placeholder="Ingrese documento"
-                onChange={(e) =>
-                  actualizarCampo("DocIdentidadAutoridad", e.target.value)
-                }
+                value={docAutoridadBusqueda}
+                placeholder="Ingresar número de DNI - Autoridad"
+                inputMode="numeric"
+                maxLength={8}
+                onChange={(e) => cambiarDocAutoridadBusqueda(e.target.value)}
               />
             </div>
 
@@ -627,6 +677,11 @@ export default function RegistroVisitasPage() {
           </div>
 
           <div className="registro-form-grid autoridad-info-grid">
+            <div className="form-field autoridad-documento">
+              <label>Nro. Documento</label>
+              <input value={String(formData.DocIdentidadAutoridad ?? "")} disabled readOnly />
+            </div>
+            
             <div className="form-field autoridad-nombres">
               <label>Nombres</label>
               <input value={String(formData.NombresAutoridad ?? "")} disabled readOnly />
@@ -667,13 +722,13 @@ export default function RegistroVisitasPage() {
 
           <div className="registro-form-grid cols-4">
             <div className="form-field">
-              <label>Nro. Documento *</label>
+              <label>Nro. DNI *</label>
               <input
-                value={String(formData.DocIdentidadRepresentante ?? "")}
-                placeholder="Ingrese documento"
-                onChange={(e) =>
-                  actualizarCampo("DocIdentidadRepresentante", e.target.value)
-                }
+                value={docRepresentanteBusqueda}
+                placeholder="Ingresar número de DNI - Representante"
+                inputMode="numeric"
+                maxLength={8}
+                onChange={(e) => cambiarDocRepresentanteBusqueda(e.target.value)}
               />
             </div>
 
@@ -717,6 +772,11 @@ export default function RegistroVisitasPage() {
           </div>
 
           <div className="registro-form-grid representante-info-grid">
+            <div className="form-field representante-documento">
+              <label>Nro. Documento</label>
+              <input value={String(formData.DocIdentidadRepresentante ?? "")} disabled readOnly />
+            </div>
+
             <div className="form-field representante-nombres">
               <label>Nombres</label>
               <input value={String(formData.NombresRepresentante ?? "")} disabled readOnly />

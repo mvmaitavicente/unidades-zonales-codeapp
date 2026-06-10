@@ -2473,3 +2473,141 @@
     grid-column: 1;
   }
 }
+
+
+/* (INICIO) Layout de Registro de Visitas - Formulario */
+
+.visita-layout-excel {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+}
+
+.visita-asunto {
+  grid-column: span 8;
+}
+
+.visita-fecha-inicio {
+  grid-column: span 2;
+}
+
+.visita-fecha-fin {
+  grid-column: span 2;
+}
+
+.visita-medio {
+  grid-column: span 3;
+}
+
+.visita-link {
+  grid-column: span 6;
+}
+
+.visita-expediente {
+  grid-column: span 3;
+}
+
+.visita-detalle {
+  grid-column: span 6;
+}
+
+.visita-observacion {
+  grid-column: span 6;
+}
+
+/* (FIN) Layout de Registro de Visitas - Formulario */
+
+@media (max-width: 900px) {
+  .visita-layout-excel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .visita-detalle,
+  .visita-observacion {
+    grid-column: auto !important;
+  }
+}
+
+
+.colegio-info-grid,
+.autoridad-info-grid,
+.representante-info-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, 1fr) !important;
+  gap: 18px !important;
+}
+
+.colegio-codigo {
+  grid-column: span 2;
+}
+
+.colegio-nombre {
+  grid-column: span 5;
+}
+
+.colegio-ugel {
+  grid-column: span 5;
+}
+
+.colegio-region,
+.colegio-provincia,
+.colegio-distrito {
+  grid-column: span 2;
+}
+
+.colegio-direccion {
+  grid-column: span 6;
+}
+
+.autoridad-tipodoc,
+.autoridad-documento,
+.representante-tipodoc,
+.representante-documento {
+  grid-column: span 2;
+}
+
+.autoridad-nombres,
+.autoridad-apellidos,
+.representante-nombres,
+.representante-apellidos {
+  grid-column: span 4;
+}
+
+.autoridad-tipo-entidad,
+.autoridad-cargo,
+.representante-unidad,
+.representante-cargo {
+  grid-column: span 3;
+}
+
+.autoridad-correo,
+.representante-correo {
+  grid-column: span 6;
+}
+
+@media (max-width: 900px) {
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > * {
+    grid-column: auto !important;
+  }
+}
+
+/* Modal de busqueda avanzada de Locales escolares */
+
+.form-action-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.form-action-field button {
+  height: 42px;
+  width: 100%;
+}
