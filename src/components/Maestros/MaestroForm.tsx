@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoaderCircle } from "lucide-react";
 import type {
   MaestroConfig,
   MaestroFieldConfig,
@@ -25,6 +26,18 @@ const decimal = (value: string) => /^\d*\.?\d*$/.test(value);
 
 function validarDominioCorreo(value: string, domain: string) {
   return value.toLowerCase().endsWith(domain.toLowerCase());
+}
+
+function toNumberOrZero(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function toBoolean(value: unknown): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  const text = String(value ?? "").trim().toLowerCase();
+  return ["true", "1", "sí", "si", "yes", "y", "x"].includes(text);
 }
 
 export default function MaestroForm({
@@ -62,10 +75,12 @@ export default function MaestroForm({
     if (!field.catalogoKey) return undefined;
 
     const value = formData[field.key];
+    if (value === undefined || value === null || value === "") return undefined;
+
     const options = catalogos[field.catalogoKey] ?? [];
 
     return options.find(
-      (option) => Number(option.value) === Number(value)
+      (option) => String(option.value) === String(value)
     ) as CatalogoOptionExtra | undefined;
   };
 
@@ -80,9 +95,10 @@ export default function MaestroForm({
     if (!option) return null;
 
     return {
-      minLength: Number(option.extra?.LongitudMinima ?? 0 ),
-      maxLength: Number(option.extra?.LongitudMaxima ?? 0 ),
-      onlyNumbers: Boolean(option.extra?.SoloNumeros),
+      minLength: toNumberOrZero(option.extra?.LongitudMinima),
+      maxLength: toNumberOrZero(option.extra?.LongitudMaxima),
+      onlyNumbers: toBoolean(option.extra?.SoloNumeros),
+      label: option.label,
     };
   };
 
@@ -102,10 +118,22 @@ export default function MaestroForm({
 
     if (maxLength && textValue.length > maxLength) return;
 
-    setFormData((prev) => ({
-      ...prev,
-      [field.key]: value,
-    }));
+    setFormData((prev) => {
+      const next: MaestroFormData = {
+        ...prev,
+        [field.key]: value,
+      };
+
+      if (field.type === "lookup") {
+        config.fields.forEach((candidate) => {
+          if (candidate.validation?.dynamicDocumentFrom === field.key) {
+            next[candidate.key] = "";
+          }
+        });
+      }
+
+      return next;
+    });
   };
 
   const validarFormulario = (): boolean => {
@@ -252,7 +280,7 @@ export default function MaestroForm({
                     ? "Seleccione primero el tipo de documento"
                     : field.placeholder
                 }
-                maxLength={maxLength}
+                maxLength={maxLength || undefined}
                 inputMode={
                   field.validation?.onlyNumbers || documentoRule?.onlyNumbers
                     ? "numeric"
@@ -262,6 +290,14 @@ export default function MaestroForm({
                 }
                 onChange={(e) => actualizarCampo(field, e.target.value)}
               />
+
+              {documentoRule && documentoRule.minLength > 0 && documentoRule.maxLength > 0 && (
+                <small className="form-help">
+                  {documentoRule.minLength === documentoRule.maxLength
+                    ? `Debe tener exactamente ${documentoRule.maxLength} caracteres${documentoRule.onlyNumbers ? " numéricos" : ""}.`
+                    : `Debe tener entre ${documentoRule.minLength} y ${documentoRule.maxLength} caracteres${documentoRule.onlyNumbers ? " numéricos" : ""}.`}
+                </small>
+              )}
 
               {field.validation?.emailDomain &&
                 String(value).trim() &&
@@ -284,11 +320,12 @@ export default function MaestroForm({
       </div>
 
       <div className="form-actions">
-        <button type="button" onClick={onCancelar}>
+        <button type="button" onClick={onCancelar} disabled={saving}>
           Cancelar
         </button>
 
         <button type="submit" disabled={saving}>
+          {saving ? <LoaderCircle className="spin-icon" size={17} /> : null}
           {saving ? "Guardando..." : itemEditando ? "Actualizar" : "Guardar"}
         </button>
       </div>

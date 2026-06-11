@@ -6,11 +6,12 @@ import {
   RotateCcw,
   Save,
   Search,
+  LoaderCircle,
   UserPlus,
   UsersRound,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LocalEscolarSearchModal from "../components/transacciones/LocalEscolarSearchModal";
 import MaestroQuickCreateModal from "../components/transacciones/MaestroQuickCreateModal";
@@ -24,16 +25,15 @@ import {
   type RawSharePointItem,
 } from "../services/maestro.service";
 import { crearTransaccion } from "../services/transaccion.service";
+import { obtenerUbicacionPorIdUbigeoKey } from "../services/ubicacion.service";
 import type { TransaccionFormData } from "../types/transaccion.types";
 
 const LOCAL_ESCOLAR_SELECT_FIELDS = [
   "CodigoLocal",
   "NombreIE",
   "NombreUGEL",
-  "Region",
-  "Provincia",
-  "Distrito",
   "Direccion",
+  "IdUbigeoKey",
 ];
 
 const initialData: TransaccionFormData = {
@@ -74,11 +74,19 @@ const initialData: TransaccionFormData = {
 
 export default function RegistroVisitasPage() {
   const navigate = useNavigate();
-  const { catalogos } = useCatalogosGlobal();
+  const { catalogos, recargarCatalogos } = useCatalogosGlobal();
   const config = transaccionesConfig.visitaAutoridades;
+
+  useEffect(() => {
+    recargarCatalogos();
+  }, [recargarCatalogos]);
 
   const [formData, setFormData] = useState<TransaccionFormData>(initialData);
   const [saving, setSaving] = useState(false);
+  const [loadingCodigoLocal, setLoadingCodigoLocal] = useState(false);
+  const [loadingAutoridad, setLoadingAutoridad] = useState(false);
+  const [loadingRepresentante, setLoadingRepresentante] = useState(false);
+  const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
@@ -170,15 +178,32 @@ export default function RegistroVisitasPage() {
     }));
   };
 
-  const aplicarLocalEscolar = (item: RawSharePointItem) => {
+  const aplicarLocalEscolar = async (item: RawSharePointItem) => {
+    const idUbigeoKey = item.values.IdUbigeoKey;
+
+    let region = String(item.values.Region ?? "");
+    let provincia = String(item.values.Provincia ?? "");
+    let distrito = String(item.values.Distrito ?? "");
+
+    if ((!region || !provincia || !distrito) && idUbigeoKey) {
+      try {
+        const ubicacion = await obtenerUbicacionPorIdUbigeoKey(String(idUbigeoKey));
+        region = region || String(ubicacion?.Region || ubicacion?.RegionSinAcento || "");
+        provincia = provincia || String(ubicacion?.Provincia || ubicacion?.ProvinciaSinAcento || "");
+        distrito = distrito || String(ubicacion?.Distrito ?? "");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
       CodigoLocal: String(item.values.CodigoLocal ?? ""),
       NombreIE: String(item.values.NombreIE ?? ""),
-      NombreUGEL: String(item.values.NombreUGEL ?? ""),
-      Region: String(item.values.Region ?? ""),
-      Provincia: String(item.values.Provincia ?? ""),
-      Distrito: String(item.values.Distrito ?? ""),
+      NombreUGEL: String(item.values.NombreUGEL ?? item.values.NombreUgel ?? ""),
+      Region: region,
+      Provincia: provincia,
+      Distrito: distrito,
       Direccion: String(item.values.Direccion ?? ""),
     }));
 
@@ -189,27 +214,35 @@ export default function RegistroVisitasPage() {
 
   const buscarCodigoLocal = async () => {
     setError("");
+    setLoadingCodigoLocal(true);
 
     const codigoLocal = codigoLocalBusqueda.trim();
 
-    if (codigoLocal.length !== 6) {
-      setError("El código local debe tener exactamente 6 números.");
-      return;
+    try {
+      if (codigoLocal.length !== 6) {
+        setError("El código local debe tener exactamente 6 números.");
+        return;
+      }
+
+      const local = await buscarItemListaPorCampo({
+        listId: SHAREPOINT_CONFIG.lists.localEscolar,
+        campo: "CodigoLocal",
+        valor: codigoLocal,
+        selectFields: LOCAL_ESCOLAR_SELECT_FIELDS,
+      });
+
+      if (!local) {
+        setError("No se encontró el código local. Puede usar la búsqueda avanzada.");
+        return;
+      }
+
+      await aplicarLocalEscolar(local);
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo buscar el código local.");
+    } finally {
+      setLoadingCodigoLocal(false);
     }
-
-    const local = await buscarItemListaPorCampo({
-      listId: SHAREPOINT_CONFIG.lists.localEscolar,
-      campo: "CodigoLocal",
-      valor: codigoLocal,
-      selectFields: LOCAL_ESCOLAR_SELECT_FIELDS,
-    });
-
-    if (!local) {
-      setError("No se encontró el código local. Puede usar la búsqueda avanzada.");
-      return;
-    }
-
-    aplicarLocalEscolar(local);
   };
 
   /* Fin Función BuscarCodigoLocal */
@@ -238,25 +271,33 @@ export default function RegistroVisitasPage() {
 
   const buscarRepresentante = async () => {
     setError("");
+    setLoadingRepresentante(true);
 
     const nroDocumento = docRepresentanteBusqueda.trim();
 
-    if (nroDocumento.length !== 8) {
-      setError("El documento del representante PRONIED debe tener exactamente 8 números.");
-      return;
+    try {
+      if (nroDocumento.length !== 8) {
+        setError("El documento del representante PRONIED debe tener exactamente 8 números.");
+        return;
+      }
+
+      const persona = await buscarMaestroPorDocumento({
+        config: maestrosConfig.personal,
+        nroDocumento,
+      });
+
+      if (!persona) {
+        setError("No se encontró el personal. Puede registrarlo sin salir del formulario.");
+        return;
+      }
+
+      aplicarRepresentante(persona, nroDocumento);
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo buscar el representante PRONIED.");
+    } finally {
+      setLoadingRepresentante(false);
     }
-
-    const persona = await buscarMaestroPorDocumento({
-      config: maestrosConfig.personal,
-      nroDocumento,
-    });
-
-    if (!persona) {
-      setError("No se encontró el personal. Puede registrarlo sin salir del formulario.");
-      return;
-    }
-
-    aplicarRepresentante(persona, nroDocumento);
   };
 
   /* Fin Buscar Representante */
@@ -288,25 +329,33 @@ export default function RegistroVisitasPage() {
 
   const buscarAutoridad = async () => {
     setError("");
+    setLoadingAutoridad(true);
 
     const nroDocumento = docAutoridadBusqueda.trim();
 
-    if (nroDocumento.length !== 8) {
-      setError("El documento de la autoridad debe tener exactamente 8 números.");
-      return;
+    try {
+      if (nroDocumento.length !== 8) {
+        setError("El documento de la autoridad debe tener exactamente 8 números.");
+        return;
+      }
+
+      const autoridad = await buscarMaestroPorDocumento({
+        config: maestrosConfig.autoridades,
+        nroDocumento,
+      });
+
+      if (!autoridad) {
+        setError("No se encontró la autoridad. Puede registrarla sin salir del formulario.");
+        return;
+      }
+
+      aplicarAutoridad(autoridad, nroDocumento);
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo buscar la autoridad.");
+    } finally {
+      setLoadingAutoridad(false);
     }
-
-    const autoridad = await buscarMaestroPorDocumento({
-      config: maestrosConfig.autoridades,
-      nroDocumento,
-    });
-
-    if (!autoridad) {
-      setError("No se encontró la autoridad. Puede registrarla sin salir del formulario.");
-      return;
-    }
-
-    aplicarAutoridad(autoridad, nroDocumento);
   };
 
    /* Fin BuscarAutoridad */ 
@@ -349,7 +398,7 @@ export default function RegistroVisitasPage() {
     return "";
   };
 
-  const guardar = async (event: React.FormEvent<HTMLFormElement>) => {
+  const solicitarGuardar = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setMensaje("");
@@ -362,12 +411,20 @@ export default function RegistroVisitasPage() {
       return;
     }
 
+    setConfirmSaveOpen(true);
+  };
+
+  const confirmarGuardar = async () => {
+    setConfirmSaveOpen(false);
     setSaving(true);
 
     try {
       const codigo = await crearTransaccion(config, formData);
       setMensaje(`Visita registrada correctamente. Código generado: ${codigo}`);
       setFormData(initialData);
+      setCodigoLocalBusqueda("");
+      setDocAutoridadBusqueda("");
+      setDocRepresentanteBusqueda("");
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "No se pudo guardar la visita.");
@@ -414,7 +471,7 @@ export default function RegistroVisitasPage() {
         </div>
       )}
 
-      <form className="registro-form-shell" onSubmit={guardar}>
+      <form className="registro-form-shell" onSubmit={solicitarGuardar}>
         <section className="registro-section-card section-visita">
           <div className="registro-section-header">
             <div className="registro-section-icon">
@@ -543,9 +600,10 @@ export default function RegistroVisitasPage() {
                 type="button"
                 className="primary-button soft-primary-button"
                 onClick={buscarCodigoLocal}
+                disabled={loadingCodigoLocal}
               >
-                <Search size={17} />
-                Buscar
+                {loadingCodigoLocal ? <LoaderCircle className="spin-icon" size={17} /> : <Search size={17} />}
+                {loadingCodigoLocal ? "Buscando..." : "Buscar"}
               </button>
             </div>
 
@@ -643,9 +701,10 @@ export default function RegistroVisitasPage() {
                 type="button"
                 className="primary-button soft-primary-button"
                 onClick={buscarAutoridad}
+                disabled={loadingAutoridad}
               >
-                <Search size={17} />
-                Buscar
+                {loadingAutoridad ? <LoaderCircle className="spin-icon" size={17} /> : <Search size={17} />}
+                {loadingAutoridad ? "Buscando..." : "Buscar"}
               </button>
             </div>
 
@@ -738,9 +797,10 @@ export default function RegistroVisitasPage() {
                 type="button"
                 className="primary-button soft-primary-button"
                 onClick={buscarRepresentante}
+                disabled={loadingRepresentante}
               >
-                <Search size={17} />
-                Buscar
+                {loadingRepresentante ? <LoaderCircle className="spin-icon" size={17} /> : <Search size={17} />}
+                {loadingRepresentante ? "Buscando..." : "Buscar"}
               </button>
             </div>
 
@@ -815,11 +875,46 @@ export default function RegistroVisitasPage() {
           </button>
 
           <button type="submit" className="primary-button" disabled={saving}>
-            <Save size={17} />
+            {saving ? <LoaderCircle className="spin-icon" size={17} /> : <Save size={17} />}
             {saving ? "Guardando..." : "Guardar visita"}
           </button>
         </div>
       </form>
+
+
+      {saving && (
+        <div className="blocking-loader">
+          <div className="blocking-loader-card">
+            <LoaderCircle className="spin-icon" size={28} />
+            <span>Guardando visita...</span>
+          </div>
+        </div>
+      )}
+
+      {confirmSaveOpen && (
+        <div className="modal-overlay">
+          <div className="confirm-modal-card">
+            <h2>Confirmar registro</h2>
+            <p>¿Está seguro de guardar esta visita?</p>
+            <div className="confirm-modal-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setConfirmSaveOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="primary-button"
+                onClick={confirmarGuardar}
+              >
+                Confirmar guardado
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalLocalOpen && (
         <LocalEscolarSearchModal

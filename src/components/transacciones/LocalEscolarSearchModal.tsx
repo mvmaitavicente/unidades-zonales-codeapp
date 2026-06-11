@@ -1,4 +1,4 @@
-import { Search, X } from "lucide-react";
+import { LoaderCircle, MapPin, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SHAREPOINT_CONFIG } from "../../config/sharepoint.config";
 import {
@@ -22,25 +22,12 @@ type Props = {
 const LOCAL_ESCOLAR_SELECT_FIELDS = [
   "CodigoLocal",
   "NombreIE",
-  "NombreUGEL",
-  "Region",
-  "Provincia",
-  "Distrito",
+  "NombreUgel",
   "Direccion",
-  "RegionSinAcento",
-  "ProvinciaSinAcento",
-  "DistritoSinAcento",
-  "NombreIESinAcento",
+  "IdUbigeoKey",
 ];
 
-const ITEMS_POR_PAGINA = 10;
-
-function normalizarTexto(value: string) {
-  return String(value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
+const ITEMS_POR_PAGINA = 5;
 
 export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
   const [regiones, setRegiones] = useState<RegionOption[]>([]);
@@ -51,8 +38,6 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
   const [provinciaSeleccionada, setProvinciaSeleccionada] = useState("");
   const [distritoSeleccionado, setDistritoSeleccionado] = useState("");
 
-  const [nombreIE, setNombreIE] = useState("");
-
   const [loadingRegiones, setLoadingRegiones] = useState(false);
   const [loadingProvincias, setLoadingProvincias] = useState(false);
   const [loadingDistritos, setLoadingDistritos] = useState(false);
@@ -62,7 +47,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
   const [paginaActual, setPaginaActual] = useState(1);
   const [error, setError] = useState("");
 
-  const totalPaginas = Math.ceil(items.length / ITEMS_POR_PAGINA);
+  const totalPaginas = Math.max(1, Math.ceil(items.length / ITEMS_POR_PAGINA));
 
   const itemsPaginados = items.slice(
     (paginaActual - 1) * ITEMS_POR_PAGINA,
@@ -88,15 +73,19 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
     cargarRegiones();
   }, []);
 
+  const limpiarResultados = () => {
+    setItems([]);
+    setPaginaActual(1);
+    setError("");
+  };
+
   const cambiarRegion = async (value: string) => {
     setRegionSeleccionada(value);
     setProvinciaSeleccionada("");
     setDistritoSeleccionado("");
     setProvincias([]);
     setDistritos([]);
-    setItems([]);
-    setPaginaActual(1);
-    setError("");
+    limpiarResultados();
 
     if (!value) return;
 
@@ -117,9 +106,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
     setProvinciaSeleccionada(value);
     setDistritoSeleccionado("");
     setDistritos([]);
-    setItems([]);
-    setPaginaActual(1);
-    setError("");
+    limpiarResultados();
 
     if (!value || !regionSeleccionada) return;
 
@@ -140,11 +127,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
     }
   };
 
-  const buscar = async () => {
-    setError("");
-    setItems([]);
-    setPaginaActual(1);
-
+  const buscarPorUbicacion = async () => {
     if (!regionSeleccionada) {
       setError("Seleccione una región.");
       return;
@@ -160,45 +143,64 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
       return;
     }
 
+    const distrito = distritos.find((item) => item.id === distritoSeleccionado);
+    const idUbigeoKeys = (distrito?.IdUbigeoKeys ?? [])
+      .map(Number)
+      .filter((value) => value > 0);
+
+    if (!distrito || idUbigeoKeys.length === 0) {
+      setError("El distrito seleccionado no tiene IdUbigeoKey configurado.");
+      return;
+    }
+
+    const region = regiones.find(
+      (item) => item.RegionSinAcento === regionSeleccionada
+    );
+
+    const provincia = provincias.find(
+      (item) => item.ProvinciaSinAcento === provinciaSeleccionada
+    );
+
+    const data = await buscarItemsListaConFiltros({
+      listId: SHAREPOINT_CONFIG.lists.localEscolar,
+      selectFields: LOCAL_ESCOLAR_SELECT_FIELDS,
+      filtros: [
+        {
+          campo: "IdUbigeoKey",
+          valor: idUbigeoKeys,
+          operador: "in",
+          tipo: "number",
+        },
+      ],
+      top: 500,
+    });
+
+    const dataEnriquecida = data.map((item) => ({
+      ...item,
+      values: {
+        ...item.values,
+        Region: region?.Region ?? "",
+        Provincia: provincia?.Provincia ?? "",
+        Distrito: distrito.Distrito,
+      },
+    }));
+
+    setItems(dataEnriquecida);
+    setPaginaActual(1);
+
+    if (dataEnriquecida.length === 0) {
+      setError("No se encontraron locales escolares para el distrito seleccionado.");
+    }
+  };
+
+  const buscar = async () => {
+    setError("");
+    setItems([]);
+    setPaginaActual(1);
     setLoading(true);
 
     try {
-      const nombreNormalizado = normalizarTexto(nombreIE);
-
-      const data = await buscarItemsListaConFiltros({
-        listId: SHAREPOINT_CONFIG.lists.localEscolar,
-        selectFields: LOCAL_ESCOLAR_SELECT_FIELDS,
-        filtros: [
-          {
-            campo: "RegionSinAcento",
-            valor: regionSeleccionada,
-            operador: "eq",
-          },
-          {
-            campo: "ProvinciaSinAcento",
-            valor: provinciaSeleccionada,
-            operador: "eq",
-          },
-          {
-            campo: "DistritoSinAcento",
-            valor: distritoSeleccionado,
-            operador: "eq",
-          },
-          {
-            campo: "NombreIESinAcento",
-            valor: nombreNormalizado,
-            operador: "contains",
-          },
-        ],
-        top: 50,
-      });
-
-      setItems(data);
-      setPaginaActual(1);
-
-      if (data.length === 0) {
-        setError("No se encontraron locales escolares con los filtros indicados.");
-      }
+      await buscarPorUbicacion();
     } catch (err) {
       console.error(err);
       setError("No se pudieron buscar locales escolares.");
@@ -211,7 +213,6 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
     setRegionSeleccionada("");
     setProvinciaSeleccionada("");
     setDistritoSeleccionado("");
-    setNombreIE("");
     setProvincias([]);
     setDistritos([]);
     setItems([]);
@@ -221,11 +222,11 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
 
   return (
     <div className="modal-overlay">
-      <div className="maestro-modal">
+      <div className="maestro-modal local-school-modal">
         <div className="maestro-modal-header">
           <div>
             <h2>Buscar Local Escolar</h2>
-            <p>Filtra por región, provincia, distrito o nombre de I.E.</p>
+            <p>Seleccione región, provincia y distrito para listar los locales disponibles.</p>
           </div>
 
           <button className="modal-close-button" type="button" onClick={onClose}>
@@ -234,13 +235,20 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
         </div>
 
         <div className="maestro-modal-body">
-          <div className="maestro-form-grid">
+          <div className="local-search-mode-box location-only">
+            <div className="local-search-help full">
+              <MapPin size={17} />
+              Búsqueda avanzada por ubicación. Los distritos se muestran una sola vez y se consultan todos sus IdUbigeoKey asociados.
+            </div>
+          </div>
+
+          <div className="local-search-filters">
             <div className="form-field">
-              <label>Región</label>
+              <label>Región *</label>
               <select
                 value={regionSeleccionada}
                 onChange={(e) => cambiarRegion(e.target.value)}
-                disabled={loadingRegiones}
+                disabled={loadingRegiones || loading}
               >
                 <option value="">
                   {loadingRegiones ? "Cargando regiones..." : "Seleccionar región"}
@@ -255,11 +263,11 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
             </div>
 
             <div className="form-field">
-              <label>Provincia</label>
+              <label>Provincia *</label>
               <select
                 value={provinciaSeleccionada}
                 onChange={(e) => cambiarProvincia(e.target.value)}
-                disabled={!regionSeleccionada || loadingProvincias}
+                disabled={!regionSeleccionada || loadingProvincias || loading}
               >
                 <option value="">
                   {!regionSeleccionada
@@ -278,16 +286,14 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
             </div>
 
             <div className="form-field">
-              <label>Distrito</label>
+              <label>Distrito *</label>
               <select
                 value={distritoSeleccionado}
                 onChange={(e) => {
                   setDistritoSeleccionado(e.target.value);
-                  setItems([]);
-                  setPaginaActual(1);
-                  setError("");
+                  limpiarResultados();
                 }}
-                disabled={!provinciaSeleccionada || loadingDistritos}
+                disabled={!provinciaSeleccionada || loadingDistritos || loading}
               >
                 <option value="">
                   {!provinciaSeleccionada
@@ -298,46 +304,32 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
                 </option>
 
                 {distritos.map((item) => (
-                  <option key={item.id} value={item.DistritoSinAcento}>
+                  <option key={item.id} value={item.id}>
                     {item.Distrito}
                   </option>
                 ))}
               </select>
             </div>
-
-            <div className="form-field">
-              <label>Nombre de la Institución Educativa</label>
-              <input
-                value={nombreIE}
-                onChange={(e) => setNombreIE(e.target.value)}
-                placeholder="Opcional. Ejemplo: San José"
-              />
-            </div>
           </div>
 
-          <div className="form-field form-action-field">
-            <label>&nbsp;</label>
-
+          <div className="local-search-actions-row location-actions">
             <button
               type="button"
-              className="secondary-button"
+              className="secondary-button local-search-clear"
               onClick={limpiarFiltros}
               disabled={loading}
             >
               Limpiar
             </button>
-          </div>
-
-          <div className="form-field form-action-field">
-            <label>&nbsp;</label>
 
             <button
               type="button"
+              className="primary-button local-search-submit"
               onClick={buscar}
               disabled={loading}
             >
-              <Search size={16} />
-              {loading ? "Buscando..." : "Buscar"}
+              {loading ? <LoaderCircle className="spin-icon" size={16} /> : <Search size={16} />}
+              {loading ? "Buscando..." : "Buscar locales"}
             </button>
           </div>
 
@@ -349,6 +341,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
                 <tr>
                   <th>Código Local</th>
                   <th>Nombre I.E.</th>
+                  <th>UGEL</th>
                   <th>Región</th>
                   <th>Provincia</th>
                   <th>Distrito</th>
@@ -361,6 +354,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
                   <tr key={item.itemId}>
                     <td>{String(item.values.CodigoLocal ?? "")}</td>
                     <td>{String(item.values.NombreIE ?? "")}</td>
+                    <td>{String(item.values.NombreUgel ?? item.values.NombreUGEL ?? "")}</td>
                     <td>{String(item.values.Region ?? "")}</td>
                     <td>{String(item.values.Provincia ?? "")}</td>
                     <td>{String(item.values.Distrito ?? "")}</td>
@@ -378,13 +372,18 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
 
                 {items.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={6}>No hay resultados.</td>
+                    <td colSpan={7}>No hay resultados.</td>
                   </tr>
                 )}
 
                 {loading && (
                   <tr>
-                    <td colSpan={6}>Buscando locales escolares...</td>
+                    <td colSpan={7}>
+                      <span className="inline-loading">
+                        <LoaderCircle className="spin-icon" size={16} />
+                        Buscando locales escolares...
+                      </span>
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -402,7 +401,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
                   <button
                     type="button"
                     disabled={paginaActual === 1}
-                    onClick={() => setPaginaActual((prev) => prev - 1)}
+                    onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
                   >
                     Anterior
                   </button>
@@ -414,7 +413,7 @@ export default function LocalEscolarSearchModal({ onClose, onSelect }: Props) {
                   <button
                     type="button"
                     disabled={paginaActual === totalPaginas}
-                    onClick={() => setPaginaActual((prev) => prev + 1)}
+                    onClick={() => setPaginaActual((prev) => Math.min(totalPaginas, prev + 1))}
                   >
                     Siguiente
                   </button>

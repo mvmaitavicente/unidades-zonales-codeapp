@@ -3,15 +3,17 @@ export const SHAREPOINT_CONFIG = {
     "proniedoti.sharepoint.com,24c388e8-793d-47b7-8687-18028d6663f7,9939e5bc-b700-4b5d-a796-67bd4da3a462",
 
   lists: {
+    catalogoVersion: "b29da8d8-031d-4c41-93c6-c259cb60e129",
+    
     region: "d69389f8-cb86-466a-b6d3-765764246428",
     provincia: "88d9cdd3-9eac-467d-8ea7-9056072b819d",
-    distrito: "fc890606-e23c-45c5-be27-361a6459b271",
+    distrito: "7f00deba-e625-449a-9ee4-7614c38ad332",
 
     visitaAutoridades: "61d65e35-a870-40db-8cb0-b8652ca1c708",
     
     autoridades: "b96b1b32-fcee-48e8-af03-e545b36d62ec",
     personal: "bfb43e93-a366-47a6-a2ee-af0e857f6d3d",
-    localEscolar: "77373caa-64e8-49ac-80a1-460253028e79",
+    localEscolar: "0f76ef6f-aec2-4ad7-a51c-d903d79adc33",
 
     tipoDocumento: "7037c5ef-28cc-419e-b662-941680912165",
     cargo: "ac602911-b042-40b7-913c-6a79c89e1a9c",

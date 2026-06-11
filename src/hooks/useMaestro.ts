@@ -17,19 +17,24 @@ export function useMaestro(config: MaestroConfig) {
   const [items, setItems] = useState<MaestroItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const [busqueda, setBusqueda] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltro>("todos");
   const [paginaActual, setPaginaActual] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
 
   const cargar = useCallback(async () => {
     setLoading(true);
+    setError("");
 
     try {
       const maestroItems = await listarMaestro(config);
       setItems(maestroItems);
       setPaginaActual(1);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "No se pudieron cargar los registros.");
     } finally {
       setLoading(false);
     }
@@ -97,6 +102,7 @@ export function useMaestro(config: MaestroConfig) {
 
   const guardar = async (data: MaestroFormData, itemId?: string) => {
     setSaving(true);
+    setError("");
 
     try {
       if (itemId) {
@@ -106,6 +112,10 @@ export function useMaestro(config: MaestroConfig) {
       }
 
       await cargar();
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "No se pudo guardar el registro.");
+      throw err;
     } finally {
       setSaving(false);
     }
@@ -113,7 +123,10 @@ export function useMaestro(config: MaestroConfig) {
 
   const cambiarEstado = async (item: MaestroItem) => {
     const activoActual = Boolean(item.values.Activo);
+    setSaving(true);
+    setError("");
 
+    try {
     await cambiarEstadoMaestro({
       config,
       itemId: item.itemId,
@@ -121,7 +134,22 @@ export function useMaestro(config: MaestroConfig) {
     });
 
     await cargar();
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "No se pudo cambiar el estado.");
+      throw err;
+    } finally {
+      setSaving(false);
+    }
   };
+
+  useEffect(() => {
+    setBusqueda("");
+    setEstadoFiltro("todos");
+    setPaginaActual(1);
+    setPageSize(20);
+    setError("");
+  }, [config.key]);
 
   useEffect(() => {
     cargar();
@@ -133,6 +161,7 @@ export function useMaestro(config: MaestroConfig) {
     itemsPaginados,
     loading,
     saving,
+    error,
 
     busqueda,
     estadoFiltro,

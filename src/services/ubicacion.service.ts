@@ -31,6 +31,10 @@ export type DistritoOption = {
   DistritoSinAcento: string;
   RegionSinAcento: string;
   ProvinciaSinAcento: string;
+  Region?: string;
+  Provincia?: string;
+  IdUbigeoKey: number;
+  IdUbigeoKeys?: number[];
 };
 
 function escapeODataValue(value: string): string {
@@ -95,18 +99,74 @@ export async function listarDistritosPorProvincia(params: {
   const url =
     `${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items` +
     `?$select=id` +
-    `&$expand=fields($select=Distrito,DistritoSinAcento,RegionSinAcento,ProvinciaSinAcento)` +
+    `&$expand=fields($select=Distrito,DistritoSinAcento,RegionSinAcento,ProvinciaSinAcento,IdUbigeoKey)` +
     `&$filter=fields/RegionSinAcento eq '${region}' and fields/ProvinciaSinAcento eq '${provincia}'` +
     `&$orderby=fields/Distrito asc` +
     `&$top=1000`;
 
   const response = await graphFetch<GraphListItemsResponse>(url);
 
-  return response.value.map((item) => ({
+  const agrupados = new Map<string, DistritoOption>();
+
+  response.value.forEach((item) => {
+    const distrito = String(item.fields.Distrito ?? "");
+    const distritoSinAcento = String(item.fields.DistritoSinAcento ?? "");
+    const idUbigeoKey = Number(item.fields.IdUbigeoKey ?? 0);
+    const key = distritoSinAcento || distrito;
+
+    if (!key) return;
+
+    const existente = agrupados.get(key);
+
+    if (existente) {
+      if (idUbigeoKey && !existente.IdUbigeoKeys?.includes(idUbigeoKey)) {
+        existente.IdUbigeoKeys = [...(existente.IdUbigeoKeys ?? []), idUbigeoKey];
+      }
+      return;
+    }
+
+    agrupados.set(key, {
+      id: key,
+      Distrito: distrito,
+      DistritoSinAcento: distritoSinAcento,
+      RegionSinAcento: String(item.fields.RegionSinAcento ?? ""),
+      ProvinciaSinAcento: String(item.fields.ProvinciaSinAcento ?? ""),
+      IdUbigeoKey: idUbigeoKey,
+      IdUbigeoKeys: idUbigeoKey ? [idUbigeoKey] : [],
+    });
+  });
+
+  return Array.from(agrupados.values()).sort((a, b) =>
+    a.Distrito.localeCompare(b.Distrito)
+  );
+}
+export async function obtenerUbicacionPorIdUbigeoKey(
+  idUbigeoKey: number | string
+): Promise<DistritoOption | null> {
+  const siteId = SHAREPOINT_CONFIG.siteId;
+  const listId = SHAREPOINT_CONFIG.lists.distrito;
+  const id = Number(idUbigeoKey);
+
+  if (!id) return null;
+
+  const url =
+    `${GRAPH_BASE}/sites/${siteId}/lists/${listId}/items` +
+    `?$select=id` +
+    `&$expand=fields($select=Distrito,DistritoSinAcento,RegionSinAcento,ProvinciaSinAcento,IdUbigeoKey)` +
+    `&$filter=fields/IdUbigeoKey eq ${id}` +
+    `&$top=1`;
+
+  const response = await graphFetch<GraphListItemsResponse>(url);
+  const item = response.value[0];
+
+  if (!item) return null;
+
+  return {
     id: item.id,
     Distrito: String(item.fields.Distrito ?? ""),
     DistritoSinAcento: String(item.fields.DistritoSinAcento ?? ""),
     RegionSinAcento: String(item.fields.RegionSinAcento ?? ""),
     ProvinciaSinAcento: String(item.fields.ProvinciaSinAcento ?? ""),
-  }));
+    IdUbigeoKey: Number(item.fields.IdUbigeoKey ?? 0),
+  };
 }

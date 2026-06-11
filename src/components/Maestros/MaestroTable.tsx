@@ -7,6 +7,7 @@ type Props = {
   onViewDetail: (item: MaestroItem) => void;
   onEdit: (item: MaestroItem) => void;
   onToggleEstado: (item: MaestroItem) => void;
+  disabled?: boolean;
 };
 
 export default function MaestroTable({
@@ -15,6 +16,7 @@ export default function MaestroTable({
   onViewDetail,
   onEdit,
   onToggleEstado,
+  disabled = false,
 }: Props) {
   const visibleFields = config.fields.filter((field) => field.visibleInTable);
 
@@ -58,6 +60,7 @@ export default function MaestroTable({
                   className="icon-action"
                   type="button"
                   title="Ver detalle"
+                  disabled={disabled}
                   onClick={() => onViewDetail(item)}
                 >
                   <Eye size={16} />
@@ -67,6 +70,7 @@ export default function MaestroTable({
                   className="icon-action"
                   type="button"
                   title="Editar"
+                  disabled={disabled}
                   onClick={() => onEdit(item)}
                 >
                   <Pencil size={16} />
@@ -76,6 +80,7 @@ export default function MaestroTable({
                   className="icon-action"
                   type="button"
                   title={Boolean(item.values.Activo) ? "Inactivar" : "Activar"}
+                  disabled={disabled}
                   onClick={() => onToggleEstado(item)}
                 >
                   {Boolean(item.values.Activo) ? (

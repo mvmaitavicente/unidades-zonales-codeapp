@@ -2611,3 +2611,1685 @@
   height: 42px;
   width: 100%;
 }
+
+
+/* ==========================================
+   BUSQUEDA AVANZADA LOCAL ESCOLAR
+========================================== */
+
+.local-search-grid {
+  display: grid;
+  grid-template-columns: 3fr 0.9fr 1fr;
+  gap: 18px;
+  align-items: end;
+}
+
+/* Nombre IE ocupa más espacio */
+.local-search-grid .form-field:first-child {
+  width: 100%;
+}
+
+.local-search-grid .form-action-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.local-search-grid .form-action-field button {
+  height: 42px;
+  width: 100%;
+  min-width: 120px;
+}
+
+/* Botón limpiar más pequeño */
+.local-search-grid .form-action-field:first-of-type button {
+  max-width: 140px;
+}
+
+/* Botón buscar un poco más ancho */
+.local-search-grid .form-action-field:last-of-type button {
+  max-width: 160px;
+}
+
+@media (max-width: 900px) {
+  .local-search-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .local-search-grid .form-action-field button {
+    max-width: 100%;
+  }
+}
+
+.local-search-name {
+  min-width: 0;
+}
+
+.local-search-name input {
+  width: 100%;
+}
+
+
+/* ==========================================================
+   BUSQUEDA AVANZADA - LOCAL ESCOLAR
+   ========================================================== */
+
+.local-search-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.local-search-actions-row {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 150px 170px;
+  gap: 18px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+.local-search-actions-row .form-field {
+  min-width: 0;
+}
+
+.local-search-name input {
+  width: 100%;
+  height: 42px;
+}
+
+.local-search-clear,
+.local-search-submit {
+  width: 100%;
+  height: 42px !important;
+  align-self: end;
+  justify-content: center;
+}
+
+.local-search-submit {
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+}
+
+@media (max-width: 900px) {
+  .local-search-filters,
+  .local-search-actions-row {
+    grid-template-columns: 1fr;
+  }
+
+  .local-search-clear,
+  .local-search-submit {
+    width: 100%;
+  }
+}
+
+
+/* Modales - Busqueda de Colegio */
+
+.local-search-mode-box {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+.local-search-mode-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f2544;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.local-search-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid #d8e0ec;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.local-search-mode {
+  height: 44px;
+  border: 0;
+  background: #ffffff;
+  color: #0f2544;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.local-search-mode.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  box-shadow: inset 0 0 0 1px #2563eb;
+}
+
+.local-search-help {
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid #facc15;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #713f12;
+  font-weight: 700;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.local-search-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.local-search-actions-row {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 150px 170px;
+  gap: 18px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+.local-search-actions-row .form-field {
+  min-width: 0;
+}
+
+.local-search-name input {
+  width: 100%;
+  height: 42px;
+}
+
+.local-search-clear,
+.local-search-submit {
+  width: 100%;
+  height: 42px !important;
+  align-self: end;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .local-search-mode-box,
+  .local-search-filters,
+  .local-search-actions-row {
+    grid-template-columns: 1fr;
+  }
+}
+.spin-icon {
+  animation: app-spin 0.8s linear infinite;
+}
+
+@keyframes app-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.blocking-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(2px);
+}
+
+.blocking-loader-card,
+.confirm-modal-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.blocking-loader-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.confirm-modal-card {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+}
+
+.confirm-modal-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.confirm-modal-card p {
+  margin: 0;
+  color: #475569;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.inline-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   RESPONSIVE FINAL - CELULAR / TABLET
+   ========================================================== */
+
+@media (max-width: 1024px) {
+  .page-container,
+  .content-container,
+  .registro-page,
+  .bandeja-page,
+  .maestro-page,
+  .catalogos-page {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .maestro-modal {
+    width: min(96vw, 980px);
+    max-height: 92vh;
+  }
+
+  .catalogo-table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .catalogo-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content,
+  .app-content,
+  .page-content {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .maestro-modal {
+    width: 96vw;
+    max-height: 94vh;
+    border-radius: 16px;
+  }
+
+  .maestro-modal-header,
+  .maestro-modal-body {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .maestro-form,
+  .visita-form,
+  .transaccion-form,
+  .form-grid,
+  .registro-grid,
+  .section-grid,
+  .local-search-mode-box,
+  .local-search-filters,
+  .local-search-actions-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .local-search-actions-row {
+    gap: 12px;
+  }
+
+  .local-search-mode-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .local-search-mode {
+    min-height: 44px;
+  }
+
+  .local-search-clear,
+  .local-search-submit,
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination-bar,
+  .pagination-actions,
+  .form-actions,
+  .toolbar-actions,
+  .catalogo-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px;
+  }
+
+  .pagination-actions button,
+  .form-actions button,
+  .toolbar-actions button {
+    width: 100%;
+  }
+
+  .catalogo-table-card {
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maestro-modal-header h2,
+  .page-title,
+  .section-title {
+    font-size: 1.05rem !important;
+  }
+
+  .maestro-modal-body {
+    max-height: calc(94vh - 74px);
+    overflow-y: auto;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ==========================================================
+   RESPONSIVE DEFINITIVO - TABLET Y CELULAR
+   ========================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+button:disabled,
+.icon-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.main-layout,
+.page-container,
+.page-content,
+.maestro-panel,
+.registro-visitas-page,
+.registro-form-shell,
+.registro-section-card,
+.maestro-table-section,
+.catalogo-table-card,
+.table-wrapper {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea,
+.form-label input,
+.form-label select,
+.form-label textarea,
+.maestro-search input,
+.search-box input {
+  width: 100%;
+  min-width: 0;
+}
+
+.form-actions button,
+.drawer-footer button,
+.registro-actions-bar button,
+.primary-button,
+.secondary-button {
+  min-width: 0;
+}
+
+.blocking-loader {
+  padding: 16px;
+}
+
+.blocking-loader-card {
+  width: min(420px, 100%);
+  justify-content: center;
+  text-align: center;
+}
+
+@media (min-width: 768px) and (max-width: 1180px) {
+  .page-container,
+  .page-content {
+    padding: 22px;
+  }
+
+  .maestro-header,
+  .maestro-toolbar,
+  .maestro-table-section {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .maestro-toolbar {
+    grid-template-columns: 1fr 190px 180px 160px;
+    gap: 12px;
+  }
+
+  .maestro-form-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .registro-form-grid.cols-2,
+  .registro-form-grid.cols-2-custom,
+  .registro-form-grid.cols-3-custom,
+  .local-search-filters,
+  .local-search-mode-box {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .local-search-actions-row {
+    grid-template-columns: minmax(0, 1fr) 150px 170px !important;
+  }
+
+  .visita-layout-excel {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .visita-asunto,
+  .visita-detalle,
+  .visita-observacion,
+  .visita-link {
+    grid-column: span 6 !important;
+  }
+
+  .visita-fecha-inicio,
+  .visita-fecha-fin,
+  .visita-medio,
+  .visita-expediente {
+    grid-column: span 3 !important;
+  }
+
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > * {
+    grid-column: span 3 !important;
+  }
+
+  .colegio-direccion,
+  .autoridad-correo,
+  .representante-correo {
+    grid-column: span 6 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-container,
+  .page-content {
+    padding: 14px !important;
+  }
+
+  .header {
+    width: 100%;
+    padding: 0 12px !important;
+  }
+
+  .header-actions {
+    min-width: 0;
+  }
+
+  .icon-button {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .maestro-panel,
+  .registro-section-card,
+  .catalogo-card,
+  .blank-card {
+    border-radius: 16px !important;
+  }
+
+  .maestro-header,
+  .catalogo-header,
+  .registro-hero,
+  .catalogos-hero {
+    padding: 18px !important;
+    gap: 14px !important;
+  }
+
+  .maestro-header h1,
+  .registro-hero h1,
+  .catalogos-hero-content h1,
+  .page-heading h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.2;
+  }
+
+  .maestro-header p,
+  .registro-hero p,
+  .catalogos-hero-content p,
+  .page-heading p {
+    font-size: 0.9rem !important;
+  }
+
+  .maestro-toolbar,
+  .catalogo-toolbar {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 14px !important;
+    gap: 10px !important;
+  }
+
+  .maestro-search,
+  .search-box,
+  .maestro-filter,
+  .maestro-filter select {
+    width: 100% !important;
+  }
+
+  .maestro-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 6px;
+  }
+
+  .maestro-table-section {
+    padding: 14px !important;
+  }
+
+  .page-size-selector {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    width: 100%;
+  }
+
+  .page-size-selector select {
+    width: 100%;
+  }
+
+  .catalogo-table-card,
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #e5ebf3;
+    border-radius: 14px;
+  }
+
+  .catalogo-table {
+    min-width: 760px;
+  }
+
+  .actions-column {
+    min-width: 150px;
+  }
+
+  .pagination-bar,
+  .pagination-actions,
+  .form-actions,
+  .drawer-footer,
+  .confirm-modal-actions,
+  .registro-actions-bar {
+    width: 100%;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .pagination-actions button,
+  .form-actions button,
+  .drawer-footer button,
+  .confirm-modal-actions button,
+  .registro-actions-bar button,
+  .primary-button,
+  .secondary-button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .maestro-form-card {
+    margin: 14px !important;
+    padding: 16px !important;
+  }
+
+  .maestro-form-grid,
+  .registro-form-grid,
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .registro-form-grid.cols-2,
+  .registro-form-grid.cols-2-custom,
+  .registro-form-grid.cols-3-custom,
+  .visita-layout-excel,
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid,
+  .local-search-mode-box,
+  .local-search-filters,
+  .local-search-actions-row,
+  .detail-grid,
+  .catalogos-summary-grid,
+  .catalogos-hub-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .maestro-form-grid > *,
+  .registro-form-grid > *,
+  .visita-layout-excel > *,
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > *,
+  .local-search-mode-box > *,
+  .local-search-filters > *,
+  .local-search-actions-row > *,
+  .span-2,
+  .span-3,
+  .span-full,
+  .visita-asunto,
+  .visita-fecha-inicio,
+  .visita-fecha-fin,
+  .visita-medio,
+  .visita-link,
+  .visita-expediente,
+  .visita-detalle,
+  .visita-observacion,
+  .colegio-codigo,
+  .colegio-nombre,
+  .colegio-ugel,
+  .colegio-region,
+  .colegio-provincia,
+  .colegio-distrito,
+  .colegio-direccion,
+  .autoridad-tipodoc,
+  .autoridad-documento,
+  .autoridad-nombres,
+  .autoridad-apellidos,
+  .autoridad-tipo-entidad,
+  .autoridad-cargo,
+  .autoridad-correo,
+  .representante-tipodoc,
+  .representante-documento,
+  .representante-nombres,
+  .representante-apellidos,
+  .representante-unidad,
+  .representante-cargo,
+  .representante-correo {
+    grid-column: 1 / -1 !important;
+  }
+
+  .registro-form-grid {
+    padding: 16px !important;
+  }
+
+  .registro-section-header {
+    padding: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  .registro-section-icon,
+  .catalogos-hero-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    flex: 0 0 42px;
+  }
+
+  .modal-overlay,
+  .modal-backdrop {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  .maestro-modal,
+  .drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100dvh;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .maestro-modal-body,
+  .drawer-body {
+    overflow-y: auto;
+    max-height: calc(100dvh - 154px) !important;
+    padding: 16px !important;
+  }
+
+  .maestro-modal-header,
+  .drawer-header {
+    padding: 16px !important;
+  }
+
+  .drawer-footer,
+  .maestro-modal .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    padding: 12px 16px !important;
+    border-top: 1px solid #e5ebf3;
+  }
+
+  .local-search-mode-tabs {
+    grid-template-columns: 1fr !important;
+  }
+
+  .local-search-help {
+    min-height: auto;
+  }
+
+  .form-check {
+    padding-top: 0 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-container,
+  .page-content {
+    padding: 10px !important;
+  }
+
+  .maestro-header,
+  .catalogo-header,
+  .registro-hero,
+  .catalogos-hero {
+    padding: 14px !important;
+  }
+
+  .catalogo-table {
+    min-width: 700px;
+  }
+
+  .blocking-loader-card {
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================
+   AJUSTE FINAL RESPONSIVE + MAESTROS
+   ========================================================== */
+.form-help {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.form-help-error {
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.maestro-search,
+.maestro-filter,
+.maestro-filter select,
+.form-field,
+.form-field input,
+.form-field select,
+.form-field textarea {
+  min-width: 0;
+}
+
+@media (min-width: 768px) and (max-width: 1180px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 78px minmax(0, 1fr) !important;
+  }
+
+  .sidebar {
+    display: flex !important;
+  }
+
+  .page-container {
+    padding: 20px !important;
+  }
+
+  .maestro-toolbar {
+    position: static !important;
+    grid-template-columns: 1fr 180px !important;
+  }
+
+  .maestro-toolbar .secondary-button,
+  .maestro-toolbar .primary-button {
+    width: 100%;
+  }
+
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .registro-form-grid.cols-2,
+  .registro-form-grid.cols-2-custom,
+  .registro-form-grid.cols-3-custom,
+  .local-search-mode-box,
+  .local-search-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .local-search-actions-row {
+    grid-template-columns: minmax(0, 1fr) 150px 170px !important;
+  }
+
+  .visita-layout-excel,
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .visita-layout-excel > *,
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > * {
+    grid-column: span 3 !important;
+  }
+
+  .visita-asunto,
+  .visita-detalle,
+  .visita-observacion,
+  .visita-link,
+  .colegio-nombre,
+  .colegio-ugel,
+  .colegio-direccion,
+  .autoridad-correo,
+  .representante-correo {
+    grid-column: span 6 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .main-layout {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .sidebar,
+  .sidebar.collapsed {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: -286px !important;
+    width: 286px !important;
+    max-width: 86vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    z-index: 1001 !important;
+    padding: 22px 16px !important;
+    transition: left 0.25s ease !important;
+  }
+
+  .sidebar.mobile-open,
+  .sidebar.collapsed.mobile-open {
+    left: 0 !important;
+  }
+
+  .sidebar.mobile-open .brand-text,
+  .sidebar.mobile-open .nav-item span,
+  .sidebar.mobile-open .sidebar-logout span {
+    display: block !important;
+  }
+
+  .sidebar.mobile-open .nav-group-toggle {
+    display: flex !important;
+  }
+
+  .sidebar.mobile-open .nav-item,
+  .sidebar.mobile-open .sidebar-logout {
+    justify-content: flex-start !important;
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+  }
+
+  .mobile-menu-button {
+    display: grid !important;
+  }
+
+  .mobile-sidebar-close {
+    display: grid !important;
+  }
+
+  .mobile-sidebar-backdrop {
+    display: block !important;
+  }
+
+  .header {
+    position: sticky !important;
+    top: 0 !important;
+    height: 64px !important;
+    padding: 0 12px !important;
+  }
+
+  .page-container,
+  .page-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+
+  .maestro-header,
+  .registro-section-header,
+  .catalogo-header,
+  .registro-hero,
+  .catalogos-hero {
+    padding: 16px !important;
+  }
+
+  .maestro-header,
+  .catalogo-header,
+  .registro-hero,
+  .catalogos-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .maestro-toolbar,
+  .catalogo-toolbar {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  .maestro-search,
+  .search-box,
+  .maestro-filter,
+  .maestro-filter select,
+  .primary-button,
+  .secondary-button {
+    width: 100% !important;
+  }
+
+  .maestro-form-grid,
+  .registro-form-grid,
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .registro-form-grid.cols-2,
+  .registro-form-grid.cols-2-custom,
+  .registro-form-grid.cols-3-custom,
+  .visita-layout-excel,
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid,
+  .local-search-mode-box,
+  .local-search-filters,
+  .local-search-actions-row,
+  .detail-grid,
+  .catalogos-summary-grid,
+  .catalogos-hub-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .maestro-form-grid > *,
+  .registro-form-grid > *,
+  .visita-layout-excel > *,
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > *,
+  .local-search-mode-box > *,
+  .local-search-filters > *,
+  .local-search-actions-row > * {
+    grid-column: 1 / -1 !important;
+  }
+
+  .registro-form-grid,
+  .visita-layout-excel {
+    padding: 14px !important;
+  }
+
+  .form-actions,
+  .registro-actions-bar,
+  .pagination-bar,
+  .pagination-actions,
+  .drawer-footer,
+  .confirm-modal-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .form-actions button,
+  .registro-actions-bar button,
+  .pagination-actions button,
+  .drawer-footer button,
+  .confirm-modal-actions button {
+    width: 100% !important;
+  }
+
+  .catalogo-table-card,
+  .table-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .catalogo-table {
+    min-width: 760px !important;
+  }
+
+  .modal-overlay,
+  .modal-backdrop {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+
+  .maestro-modal,
+  .drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .maestro-modal-body,
+  .drawer-body {
+    overflow-y: auto !important;
+    max-height: calc(100dvh - 150px) !important;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ==========================================================
+   AJUSTES FINALES RESPONSIVE / BANDEJA / DETALLE VISITA
+   ========================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 100vw;
+}
+
+.main-layout,
+.page-container,
+.page-content,
+.maestro-panel,
+.registro-page,
+.registro-section-card,
+.catalogo-table-card,
+.maestro-table-section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-y: auto;
+}
+
+.catalogo-table-card {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.catalogo-table {
+  width: 100%;
+}
+
+.page-size-selector {
+  flex-wrap: wrap;
+}
+
+.page-size-selector select {
+  min-width: 72px;
+}
+
+.visit-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.visit-detail-section {
+  border: 1px solid #e5ebf3;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 18px;
+}
+
+.visit-detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  color: #0f2544;
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+
+.visit-detail-section-title::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #315cf6;
+  box-shadow: 0 0 0 5px rgba(49, 92, 246, 0.12);
+}
+
+.visit-detail .detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.visit-detail .detail-item {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #dfe7f2;
+  box-shadow: 0 8px 22px rgba(15, 37, 68, 0.04);
+}
+
+.visit-detail .detail-item.featured {
+  background: #f0f5ff;
+  border-color: #cddaff;
+}
+
+.visit-detail .detail-item.detail-wide {
+  grid-column: 1 / -1;
+}
+
+.visit-detail .detail-item strong {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 88px minmax(0, 1fr) !important;
+  }
+
+  .sidebar,
+  .sidebar.collapsed {
+    width: 88px !important;
+    padding: 18px 12px !important;
+  }
+
+  .sidebar .brand-text,
+  .sidebar .nav-item span,
+  .sidebar .sidebar-logout span,
+  .sidebar .nav-group-toggle {
+    display: none !important;
+  }
+
+  .sidebar .nav-item,
+  .sidebar .sidebar-logout,
+  .sidebar .sidebar-brand {
+    justify-content: center !important;
+  }
+
+  .main-layout {
+    min-width: 0 !important;
+  }
+
+  .page-content {
+    padding: 18px !important;
+  }
+
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .colegio-nombre,
+  .colegio-direccion,
+  .visita-detalle,
+  .visita-observacion {
+    grid-column: 1 / -1 !important;
+  }
+
+  .maestro-toolbar,
+  .catalogo-toolbar {
+    flex-wrap: wrap !important;
+  }
+
+  .maestro-search,
+  .search-box {
+    min-width: min(100%, 360px) !important;
+    flex: 1 1 360px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .sidebar,
+  .sidebar.collapsed {
+    position: fixed !important;
+    left: -300px !important;
+    top: 0 !important;
+    width: min(300px, 86vw) !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    z-index: 1001 !important;
+    padding: 22px 16px !important;
+    transition: left 0.22s ease !important;
+  }
+
+  .sidebar.mobile-open,
+  .sidebar.collapsed.mobile-open {
+    left: 0 !important;
+  }
+
+  .sidebar.mobile-open .brand-text,
+  .sidebar.mobile-open .nav-item span,
+  .sidebar.mobile-open .sidebar-logout span,
+  .sidebar.mobile-open .nav-group-toggle {
+    display: flex !important;
+  }
+
+  .sidebar.mobile-open .nav-item,
+  .sidebar.mobile-open .sidebar-logout,
+  .sidebar.mobile-open .sidebar-brand {
+    justify-content: flex-start !important;
+  }
+
+  .main-layout,
+  .page-content,
+  .page-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .page-content {
+    padding: 12px !important;
+  }
+
+  .maestro-panel,
+  .registro-section-card,
+  .catalogos-panel,
+  .catalogo-panel {
+    border-radius: 16px !important;
+  }
+
+  .maestro-header,
+  .registro-section-header,
+  .catalogo-header,
+  .registro-hero,
+  .catalogos-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .maestro-toolbar,
+  .catalogo-toolbar,
+  .local-search-actions-row,
+  .local-search-mode-box,
+  .local-search-filters,
+  .pagination-bar,
+  .pagination-actions,
+  .form-actions,
+  .registro-actions-bar {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .maestro-search,
+  .search-box,
+  .maestro-filter,
+  .maestro-filter select,
+  .local-search-name,
+  .primary-button,
+  .secondary-button,
+  .soft-primary-button,
+  .page-size-selector select {
+    width: 100% !important;
+  }
+
+  .registro-form-grid,
+  .registro-form-grid.cols-4,
+  .registro-form-grid.cols-3,
+  .registro-form-grid.cols-2,
+  .colegio-info-grid,
+  .autoridad-info-grid,
+  .representante-info-grid,
+  .visita-layout-excel,
+  .detail-grid,
+  .visit-detail .detail-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .registro-form-grid > *,
+  .colegio-info-grid > *,
+  .autoridad-info-grid > *,
+  .representante-info-grid > *,
+  .visit-detail .detail-item,
+  .visit-detail .detail-item.detail-wide {
+    grid-column: 1 / -1 !important;
+  }
+
+  .catalogo-table {
+    min-width: 760px !important;
+  }
+
+  .maestro-modal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .maestro-modal-header {
+    padding: 18px 16px !important;
+  }
+
+  .maestro-modal-body {
+    padding: 16px !important;
+    max-height: calc(100dvh - 82px) !important;
+    overflow-y: auto !important;
+  }
+
+  .visit-detail-section {
+    padding: 14px !important;
+    border-radius: 16px !important;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* =========================================================
+   AJUSTES FINALES - RESPONSIVE / SIDEBAR / DETALLE VISITA
+   ========================================================= */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+.app-shell {
+  min-height: 100vh !important;
+  height: 100vh !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+}
+
+.main-layout {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.sidebar,
+.sidebar.collapsed {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  align-self: stretch !important;
+  position: sticky !important;
+  top: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.sidebar-logout {
+  margin-top: auto !important;
+}
+
+.local-school-modal {
+  max-width: min(1080px, 96vw) !important;
+}
+
+.local-search-mode-box.location-only {
+  display: block !important;
+}
+
+.local-search-help.full {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  justify-content: flex-start !important;
+}
+
+.local-search-actions-row.location-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.local-search-actions-row.location-actions .local-search-clear,
+.local-search-actions-row.location-actions .local-search-submit {
+  min-width: 180px !important;
+}
+
+.visit-detail {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.visit-detail-section {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  border: 1px solid #e1e9f5 !important;
+  border-radius: 22px !important;
+  padding: 20px !important;
+  box-shadow: 0 14px 34px rgba(15, 35, 70, 0.07) !important;
+}
+
+.visit-detail-main {
+  border-color: #cddcff !important;
+  background: linear-gradient(135deg, #f7faff 0%, #eef5ff 100%) !important;
+}
+
+.visit-detail-section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 16px !important;
+  color: #102646 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.visit-detail-section-title::before {
+  content: "" !important;
+  width: 10px !important;
+  height: 28px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #3557f5 0%, #00b894 100%) !important;
+}
+
+.visit-detail .detail-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.visit-detail .detail-grid-school {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.visit-detail .detail-item {
+  background: #ffffff !important;
+  border: 1px solid #e3ebf5 !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  min-height: 76px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.visit-detail .detail-item.featured {
+  border-color: #bfd0ff !important;
+  background: #f6f8ff !important;
+}
+
+.visit-detail .detail-item.detail-wide {
+  grid-column: 1 / -1 !important;
+}
+
+.visit-detail .detail-item span {
+  color: #667997 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.035em !important;
+  margin-bottom: 7px !important;
+}
+
+.visit-detail .detail-item strong {
+  color: #102646 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.4 !important;
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+
+  .sidebar,
+  .sidebar.collapsed {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+  }
+
+  .visit-detail .detail-grid,
+  .visit-detail .detail-grid-school {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  .main-layout {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  .sidebar,
+  .sidebar.collapsed {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    position: fixed !important;
+  }
+
+  .local-search-actions-row.location-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .local-search-actions-row.location-actions .local-search-clear,
+  .local-search-actions-row.location-actions .local-search-submit {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .visit-detail .detail-grid,
+  .visit-detail .detail-grid-school {
+    grid-template-columns: 1fr !important;
+  }
+
+  .visit-detail-section {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+}

@@ -16,11 +16,13 @@ type Params = {
   listId: string;
   campoDescripcion: string;
   camposExtra?: CatalogoCampoExtra[];
+  nombreTabla?: string;
 };
 
 export function useCatalogos(params: Params) {
   const [items, setItems] = useState<CatalogoItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const ultimaCargaKeyRef = useRef("");
@@ -43,15 +45,21 @@ export function useCatalogos(params: Params) {
     params.listId,
     params.campoDescripcion,
     params.camposExtra,
+    params.nombreTabla,
   ]);
 
   const guardar = async (data: CatalogoFormData) => {
+    setSaving(true);
+    setError("");
+
+    try {
     if (data.itemId) {
       await actualizarCatalogo({
         siteId: params.siteId,
         listId: params.listId,
         campoDescripcion: params.campoDescripcion,
         data,
+        nombreTabla: params.nombreTabla,
       });
     } else {
       await crearCatalogo({
@@ -59,21 +67,41 @@ export function useCatalogos(params: Params) {
         listId: params.listId,
         campoDescripcion: params.campoDescripcion,
         data,
+        nombreTabla: params.nombreTabla,
       });
     }
 
     await cargar();
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo guardar el registro.");
+      throw err;
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cambiarEstado = async (itemId: string, activoActual: boolean) => {
+    setSaving(true);
+    setError("");
+
+    try {
     await cambiarEstadoCatalogo({
       siteId: params.siteId,
       listId: params.listId,
       itemId,
       activoActual,
+      nombreTabla: params.nombreTabla,
     });
 
     await cargar();
+    } catch (err) {
+      console.error(err);
+      setError("No se pudo cambiar el estado del registro.");
+      throw err;
+    } finally {
+      setSaving(false);
+    }
   };
 
   useEffect(() => {
@@ -88,6 +116,7 @@ export function useCatalogos(params: Params) {
   return {
     items,
     loading,
+    saving,
     error,
     cargar,
     guardar,

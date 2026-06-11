@@ -336,39 +336,74 @@ export async function buscarItemsListaConFiltros(params: {
   selectFields: string[];
   filtros?: Array<{
     campo: string;
-    valor: string;
-    operador?: "eq" | "contains";
+    valor: string | number | Array<string | number>;
+    operador?: "eq" | "contains" | "in";
+    tipo?: "text" | "number";
   }>;
   top?: number;
 }): Promise<RawSharePointItem[]> {
   const siteId = SHAREPOINT_CONFIG.siteId;
 
   const filtros = (params.filtros ?? [])
-    .filter((filtro) => filtro.valor.trim() !== "")
+    .filter((filtro) =>
+      Array.isArray(filtro.valor)
+        ? filtro.valor.length > 0
+        : String(filtro.valor ?? "").trim() !== ""
+    )
     .map((filtro) => {
-      const valorSeguro = escapeODataValue(filtro.valor.trim());
+      if (filtro.operador === "in" && Array.isArray(filtro.valor)) {
+        const condiciones = filtro.valor
+          .map((valor) => String(valor).trim())
+          .filter(Boolean)
+          .map((valor) => {
+            if (filtro.tipo === "number") {
+              return `fields/${filtro.campo} eq ${Number(valor)}`;
+            }
+
+            const valorSeguro = escapeODataValue(valor);
+            return `fields/${filtro.campo} eq '${valorSeguro}'`;
+          });
+
+        return condiciones.length ? `(${condiciones.join(" or ")})` : "";
+      }
+
+      const valorNormalizado = String(filtro.valor).trim();
 
       if (filtro.operador === "contains") {
+        const valorSeguro = escapeODataValue(valorNormalizado);
         return `contains(fields/${filtro.campo},'${valorSeguro}')`;
       }
 
+      if (filtro.tipo === "number") {
+        return `fields/${filtro.campo} eq ${Number(valorNormalizado)}`;
+      }
+
+      const valorSeguro = escapeODataValue(valorNormalizado);
       return `fields/${filtro.campo} eq '${valorSeguro}'`;
     });
 
-  const filterQuery = filtros.length
-    ? `&$filter=${filtros.join(" and ")}`
+  const filtrosValidos = filtros.filter(Boolean);
+
+  const filterQuery = filtrosValidos.length
+    ? `&$filter=${filtrosValidos.join(" and ")}`
     : "";
 
-  const url =
+  let url =
     `${GRAPH_BASE}/sites/${siteId}/lists/${params.listId}/items` +
     `?$select=id` +
     `&$expand=fields($select=${params.selectFields.join(",")})` +
     filterQuery +
-    `&$top=${params.top ?? 20}`;
+    `&$top=${params.top ?? 5000}`;
 
-  const response = await graphFetch<GraphListItemsResponse>(url);
+  const registros: GraphListItem[] = [];
 
-  return response.value.map((item) => ({
+  while (url) {
+    const response = await graphFetch<GraphListItemsResponse>(url);
+    registros.push(...response.value);
+    url = response["@odata.nextLink"] ?? "";
+  }
+
+  return registros.map((item) => ({
     itemId: item.id,
     values: item.fields,
   }));

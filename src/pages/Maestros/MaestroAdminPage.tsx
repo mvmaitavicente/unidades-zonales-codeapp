@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Plus, RefreshCcw, Search, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { LoaderCircle, Plus, RefreshCcw, Search, X } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 import { maestrosConfig } from "../../config/maestros.config";
@@ -29,16 +29,21 @@ export default function MaestroAdminPage() {
     );
   }
 
-  return <MaestroAdminContent config={config} />;
+  return <MaestroAdminContent key={config.key} config={config} />;
 }
 
 function MaestroAdminContent({ config }: { config: MaestroConfig }) {
-  const { catalogos, loading: loadingCatalogos } = useCatalogosGlobal();
+  const { catalogos, loading: loadingCatalogos, recargarCatalogos } = useCatalogosGlobal();
+
+  useEffect(() => {
+    recargarCatalogos();
+  }, [recargarCatalogos, config.key]);
 
   const {
     itemsPaginados,
     loading,
     saving,
+    error,
 
     busqueda,
     estadoFiltro,
@@ -87,8 +92,12 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
     data: Record<string, unknown>,
     itemId?: string
   ) => {
-    await guardar(data, itemId);
-    cerrarModal();
+    try {
+      await guardar(data, itemId);
+      cerrarModal();
+    } catch {
+      // El hook ya muestra el error.
+    }
   };
 
   const desde =
@@ -113,6 +122,7 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
             className="primary-button"
             type="button"
             onClick={nuevoRegistro}
+            disabled={saving}
           >
             <Plus size={18} />
             Nuevo registro
@@ -150,16 +160,19 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
             className="secondary-button"
             type="button"
             onClick={limpiarFiltros}
+            disabled={saving}
           >
             <X size={17} />
             Limpiar filtros
           </button>
 
-          <button className="secondary-button" type="button" onClick={cargar}>
+          <button className="secondary-button" type="button" onClick={cargar} disabled={loading || saving}>
             <RefreshCcw size={17} />
             Actualizar
           </button>
         </div>
+
+        {error && <div className="catalogo-error">{error}</div>}
 
         <div className="maestro-table-section">
           {loading ? (
@@ -174,6 +187,7 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
                   onChange={(e) => cambiarPageSize(Number(e.target.value))}
                 >
                   <option value={10}>10</option>
+                  <option value={20}>20</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
                 </select>
@@ -187,6 +201,7 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
                 onViewDetail={verDetalle}
                 onEdit={editarRegistro}
                 onToggleEstado={cambiarEstado}
+                disabled={saving}
               />
 
               <div className="pagination-bar">
@@ -240,7 +255,7 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
               ? `Actualiza la información de ${config.titulo.toLowerCase()}.`
               : `Completa los datos de ${config.titulo.toLowerCase()}.`
           }
-          onClose={cerrarModal}
+          onClose={saving ? () => undefined : cerrarModal}
         >
           {loadingCatalogos ? (
             <p>Cargando opciones...</p>
@@ -251,7 +266,7 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
               catalogos={catalogos}
               saving={saving}
               onGuardar={guardarRegistro}
-              onCancelar={cerrarModal}
+              onCancelar={saving ? () => undefined : cerrarModal}
             />
           )}
         </MaestroModal>
@@ -276,6 +291,15 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
             </div>
           )}
         </MaestroModal>
+      )}
+
+      {saving && (
+        <div className="blocking-loader">
+          <div className="blocking-loader-card">
+            <LoaderCircle className="spin-icon" size={22} />
+            Procesando cambios del maestro...
+          </div>
+        </div>
       )}
     </div>
   );

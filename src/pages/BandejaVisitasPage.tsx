@@ -1,5 +1,5 @@
-import { Eye, Pencil, RefreshCcw, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Eye, LoaderCircle, Pencil, RefreshCcw, Search, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TransaccionForm from "../components/transacciones/TransaccionForm";
 import { transaccionesConfig } from "../config/transacciones.config";
@@ -8,12 +8,16 @@ import { useTransacciones } from "../hooks/useTransacciones";
 import MaestroModal from "../components/Maestros/MaestroModal";
 import type { TransaccionItem } from "../types/transaccion.types";
 
-const PAGE_SIZE_DEFAULT = 20;
+const PAGE_SIZE_DEFAULT = 10;
 
 export default function BandejaVisitasPage() {
   const navigate = useNavigate();
-  const { catalogos } = useCatalogosGlobal();
+  const { catalogos, recargarCatalogos } = useCatalogosGlobal();
   const config = transaccionesConfig.visitaAutoridades;
+
+  useEffect(() => {
+    recargarCatalogos();
+  }, [recargarCatalogos]);
 
   const { items, loading, saving, error, cargar, guardar, eliminar } =
     useTransacciones(config);
@@ -107,6 +111,7 @@ export default function BandejaVisitasPage() {
             type="button"
             className="primary-button"
             onClick={() => navigate("/registro-visitas")}
+            disabled={saving}
           >
             + Nueva visita
           </button>
@@ -125,12 +130,12 @@ export default function BandejaVisitasPage() {
             />
           </div>
 
-          <button type="button" className="secondary-button" onClick={limpiarFiltros}>
+          <button type="button" className="secondary-button" onClick={limpiarFiltros} disabled={saving}>
             <X size={17} />
             Limpiar filtros
           </button>
 
-          <button type="button" className="secondary-button" onClick={cargar}>
+          <button type="button" className="secondary-button" onClick={cargar} disabled={loading || saving}>
             <RefreshCcw size={17} />
             Actualizar
           </button>
@@ -152,7 +157,7 @@ export default function BandejaVisitasPage() {
                 await guardar(data, itemId, { recargar: true });
                 setItemEditando(null);
               }}
-              onCancelar={() => setItemEditando(null)}
+              onCancelar={saving ? () => undefined : () => setItemEditando(null)}
             />
           </div>
         )}
@@ -170,6 +175,7 @@ export default function BandejaVisitasPage() {
                   onChange={(e) => cambiarPageSize(Number(e.target.value))}
                 >
                   <option value={10}>10</option>
+                  <option value={20}>20</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
                 </select>
@@ -212,6 +218,7 @@ export default function BandejaVisitasPage() {
                               className="icon-action"
                               type="button"
                               title="Ver detalle"
+                              disabled={saving}
                               onClick={() => setItemDetalle(item)}
                             >
                               <Eye size={16} />
@@ -221,6 +228,7 @@ export default function BandejaVisitasPage() {
                               className="icon-action"
                               type="button"
                               title="Editar"
+                              disabled={saving}
                               onClick={() => setItemEditando(item)}
                             >
                               <Pencil size={16} />
@@ -230,6 +238,7 @@ export default function BandejaVisitasPage() {
                               className="icon-action"
                               type="button"
                               title="Eliminar"
+                              disabled={saving}
                               onClick={() => confirmarEliminar(item.itemId)}
                             >
                               <X size={16} />
@@ -299,78 +308,169 @@ export default function BandejaVisitasPage() {
           subtitle={String(detalle.CodigoVisita ?? "Información del registro")}
           onClose={() => setItemDetalle(null)}
         >
-          <div className="detail-grid">
-            <div className="detail-item">
-              <span>Código visita</span>
-              <strong>{String(detalle.CodigoVisita ?? "-")}</strong>
-            </div>
+          <div className="visit-detail">
+            <section className="visit-detail-section visit-detail-main">
+              <div className="visit-detail-section-title">
+                <span>Información de la visita</span>
+              </div>
+              <div className="detail-grid">
+                <div className="detail-item featured">
+                  <span>Código visita</span>
+                  <strong>{String(detalle.CodigoVisita ?? "-")}</strong>
+                </div>
+                <div className="detail-item featured">
+                  <span>Asunto</span>
+                  <strong>{String(detalle.Asunto ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Detalle</span>
+                  <strong>{String(detalle.Detalle ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Observación</span>
+                  <strong>{String(detalle.Observacion ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Fecha inicio</span>
+                  <strong>{formatearFecha(detalle.FechaInicio)}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Fecha fin</span>
+                  <strong>{formatearFecha(detalle.FechaFin)}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Medio coordinación</span>
+                  <strong>{String(detalle.MedioCoordinacion ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Nro. expediente SGD</span>
+                  <strong>{String(detalle.NroExpedienteSGD ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Link informe</span>
+                  <strong>{String(detalle.LinkInforme ?? "-")}</strong>
+                </div>
+              </div>
+            </section>
 
-            <div className="detail-item">
-              <span>Asunto</span>
-              <strong>{String(detalle.Asunto ?? "-")}</strong>
-            </div>
+            <section className="visit-detail-section">
+              <div className="visit-detail-section-title">
+                <span>Información del colegio</span>
+              </div>
+              <div className="detail-grid detail-grid-school">
+                <div className="detail-item">
+                  <span>Código local</span>
+                  <strong>{String(detalle.CodigoLocal ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Nombre Institución Educativa</span>
+                  <strong>{String(detalle.NombreIE ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>UGEL</span>
+                  <strong>{String(detalle.NombreUGEL ?? detalle.NombreUgel ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Región</span>
+                  <strong>{String(detalle.Region ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Provincia</span>
+                  <strong>{String(detalle.Provincia ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Distrito</span>
+                  <strong>{String(detalle.Distrito ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Dirección Institución Educativa</span>
+                  <strong>{String(detalle.Direccion ?? detalle.DireccionIE ?? "-")}</strong>
+                </div>
+              </div>
+            </section>
 
-            <div className="detail-item">
-              <span>Detalle</span>
-              <strong>{String(detalle.Detalle ?? "-")}</strong>
-            </div>
+            <section className="visit-detail-section">
+              <div className="visit-detail-section-title">
+                <span>Autoridad visitante</span>
+              </div>
+              <div className="detail-grid">
+                <div className="detail-item">
+                  <span>Tipo doc. autoridad</span>
+                  <strong>{String(detalle.TipoDocIdentidadAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Documento autoridad</span>
+                  <strong>{String(detalle.DocIdentidadAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Nombres</span>
+                  <strong>{String(detalle.NombresAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Apellidos</span>
+                  <strong>{String(detalle.ApellidosAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Tipo entidad</span>
+                  <strong>{String(detalle.EntidadAutoridad ?? detalle.TipoEntidadAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Cargo</span>
+                  <strong>{String(detalle.CargoAutoridad ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Correo</span>
+                  <strong>{String(detalle.CorreoAutoridad ?? "-")}</strong>
+                </div>
+              </div>
+            </section>
 
-            <div className="detail-item">
-              <span>Observación</span>
-              <strong>{String(detalle.Observacion ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Fecha inicio</span>
-              <strong>{formatearFecha(detalle.FechaInicio)}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Fecha fin</span>
-              <strong>{formatearFecha(detalle.FechaFin)}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Medio coordinación</span>
-              <strong>{String(detalle.MedioCoordinacion ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Tipo doc. representante</span>
-              <strong>{String(detalle.TipoDocIdentidadRepresentante ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Documento representante</span>
-              <strong>{String(detalle.DocIdentidadRepresentante ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Tipo doc. autoridad</span>
-              <strong>{String(detalle.TipoDocIdentidadAutoridad ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Documento autoridad</span>
-              <strong>{String(detalle.DocIdentidadAutoridad ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Código local</span>
-              <strong>{String(detalle.CodigoLocal ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Nro. expediente SGD</span>
-              <strong>{String(detalle.NroExpedienteSGD ?? "-")}</strong>
-            </div>
-
-            <div className="detail-item">
-              <span>Link informe</span>
-              <strong>{String(detalle.LinkInforme ?? "-")}</strong>
-            </div>
+            <section className="visit-detail-section">
+              <div className="visit-detail-section-title">
+                <span>Representante PRONIED</span>
+              </div>
+              <div className="detail-grid">
+                <div className="detail-item">
+                  <span>Tipo doc. representante</span>
+                  <strong>{String(detalle.TipoDocIdentidadRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Documento representante</span>
+                  <strong>{String(detalle.DocIdentidadRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Nombres</span>
+                  <strong>{String(detalle.NombresRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Apellidos</span>
+                  <strong>{String(detalle.ApellidosRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Unidad Zonal</span>
+                  <strong>{String(detalle.UnidadZonalRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Cargo</span>
+                  <strong>{String(detalle.CargoRepresentante ?? "-")}</strong>
+                </div>
+                <div className="detail-item detail-wide">
+                  <span>Correo</span>
+                  <strong>{String(detalle.CorreoRepresentante ?? "-")}</strong>
+                </div>
+              </div>
+            </section>
           </div>
         </MaestroModal>
+      )}
+
+      {saving && (
+        <div className="blocking-loader">
+          <div className="blocking-loader-card">
+            <LoaderCircle className="spin-icon" size={22} />
+            Procesando cambios de la visita...
+          </div>
+        </div>
       )}
     </section>
   );

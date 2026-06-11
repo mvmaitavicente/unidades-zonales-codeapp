@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { Check, Pencil, Plus, RefreshCcw, Search, X } from "lucide-react";
+import { Check, LoaderCircle, Pencil, Plus, RefreshCcw, Search, X } from "lucide-react";
 
 import {
   catalogosConfig,
@@ -18,11 +18,12 @@ export default function CatalogosAdminPage() {
 
   const config = catalogosConfig[catalogoKey as CatalogoKey];
 
-  const { items, loading, error, cargar, guardar, cambiarEstado } = useCatalogos({
+  const { items, loading, saving, error, cargar, guardar, cambiarEstado } = useCatalogos({
     siteId: config.siteId,
     listId: config.listId,
     campoDescripcion: config.campoDescripcion,
     camposExtra: config.camposExtra,
+    nombreTabla: config.listaSharePoint,
   });
 
   const [busqueda, setBusqueda] = useState("");
@@ -95,8 +96,12 @@ export default function CatalogosAdminPage() {
       return;
     }
 
-    await guardar(data);
-    cerrarModal();
+    try {
+      await guardar(data);
+      cerrarModal();
+    } catch {
+      // El hook ya registra y muestra el error.
+    }
   };
 
   const totalColumnas = 4 + config.camposExtra.length;
@@ -110,7 +115,7 @@ export default function CatalogosAdminPage() {
             <p>Administración de la lista {config.listaSharePoint}.</p>
           </div>
 
-          <button className="primary-button" onClick={abrirNuevo} type="button">
+          <button className="primary-button" onClick={abrirNuevo} type="button" disabled={saving}>
             <Plus size={18} />
             Nuevo registro
           </button>
@@ -135,7 +140,7 @@ export default function CatalogosAdminPage() {
             Limpiar filtros
           </button>
 
-          <button className="secondary-button" onClick={cargar} type="button">
+          <button className="secondary-button" onClick={cargar} type="button" disabled={loading || saving}>
             <RefreshCcw size={17} />
             Actualizar
           </button>
@@ -193,6 +198,7 @@ export default function CatalogosAdminPage() {
                         <button
                           className="icon-action"
                           onClick={() => abrirEditar(item)}
+                          disabled={saving}
                           title="Editar"
                           type="button"
                         >
@@ -202,6 +208,7 @@ export default function CatalogosAdminPage() {
                         <button
                           className="icon-action"
                           onClick={() => cambiarEstado(item.itemId, item.activo)}
+                          disabled={saving}
                           title={item.activo ? "Inactivar" : "Activar"}
                           type="button"
                         >
@@ -270,6 +277,7 @@ export default function CatalogosAdminPage() {
                 className="secondary-button"
                 onClick={cerrarModal}
                 type="button"
+                disabled={saving}
               >
                 Cancelar
               </button>
@@ -278,10 +286,21 @@ export default function CatalogosAdminPage() {
                 className="primary-button"
                 onClick={guardarRegistro}
                 type="button"
+                disabled={saving}
               >
-                Guardar
+                {saving ? <LoaderCircle className="spin-icon" size={17} /> : null}
+                {saving ? "Guardando..." : "Guardar"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {saving && (
+        <div className="blocking-loader">
+          <div className="blocking-loader-card">
+            <LoaderCircle className="spin-icon" size={22} />
+            Procesando cambios del catálogo...
           </div>
         </div>
       )}
