@@ -4293,3 +4293,268 @@ body,
     border-radius: 18px !important;
   }
 }
+
+/* Búsqueda avanzada de maestros desde Registro de Visitas */
+.registro-form-grid.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.maestro-advanced-modal {
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #dbe6f6;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+  padding: 24px;
+}
+
+.maestro-advanced-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.maestro-advanced-header h2 {
+  margin: 0;
+  color: #001f4e;
+  font-size: 1.35rem;
+}
+
+.maestro-advanced-header p {
+  margin: 6px 0 0;
+  color: #52647d;
+}
+
+.icon-close-button {
+  border: 0;
+  background: #f1f5f9;
+  color: #0f172a;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.maestro-advanced-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.maestro-advanced-search-field {
+  grid-column: span 2;
+}
+
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #cad7ea;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #ffffff;
+}
+
+.input-with-icon input {
+  border: 0 !important;
+  outline: 0;
+  width: 100%;
+  padding-left: 0 !important;
+  box-shadow: none !important;
+}
+
+.maestro-advanced-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #52647d;
+  font-weight: 700;
+}
+
+.maestro-advanced-table-card {
+  margin-top: 0;
+}
+
+.maestro-advanced-loading {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.compact-button {
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 0.86rem;
+}
+
+.maestro-advanced-pagination {
+  margin-top: 14px;
+}
+
+@media (max-width: 1100px) {
+  .registro-form-grid.cols-5,
+  .maestro-advanced-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .maestro-advanced-search-field {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 720px) {
+  .maestro-advanced-modal {
+    width: calc(100vw - 20px);
+    padding: 18px;
+  }
+
+  .registro-form-grid.cols-5,
+  .maestro-advanced-filters,
+  .maestro-advanced-search-field {
+    grid-template-columns: 1fr;
+    grid-column: auto;
+  }
+
+  .maestro-advanced-toolbar,
+  .maestro-advanced-header {
+    flex-direction: column;
+  }
+}
+
+/* Maestro detail modal - diseño ejecutivo */
+.maestro-detail-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.maestro-detail-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.16), transparent 38%),
+    linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(239, 246, 255, 0.95));
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+}
+
+.maestro-detail-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #1d4ed8, #0f172a);
+  box-shadow: 0 16px 28px rgba(29, 78, 216, 0.24);
+}
+
+.maestro-detail-heading {
+  min-width: 0;
+}
+
+.maestro-detail-heading span {
+  display: inline-flex;
+  margin-bottom: 4px;
+  color: #2563eb;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.maestro-detail-heading h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.18rem;
+  line-height: 1.25;
+}
+
+.maestro-detail-heading p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.maestro-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.maestro-detail-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.055);
+}
+
+.maestro-detail-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.maestro-detail-item span {
+  display: block;
+  margin-bottom: 3px;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.maestro-detail-item strong {
+  display: block;
+  min-width: 0;
+  color: #0f172a;
+  font-size: 0.96rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .maestro-detail-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .maestro-detail-hero .status {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
+  .maestro-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

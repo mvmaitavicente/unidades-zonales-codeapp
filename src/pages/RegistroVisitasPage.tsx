@@ -12,9 +12,11 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import LocalEscolarSearchModal from "../components/transacciones/LocalEscolarSearchModal";
 import MaestroQuickCreateModal from "../components/transacciones/MaestroQuickCreateModal";
+import MaestroAdvancedSearchModal from "../components/transacciones/MaestroAdvancedSearchModal";
 import { maestrosConfig } from "../config/maestros.config";
 import { SHAREPOINT_CONFIG } from "../config/sharepoint.config";
 import { transaccionesConfig } from "../config/transacciones.config";
@@ -87,13 +89,13 @@ export default function RegistroVisitasPage() {
   const [loadingAutoridad, setLoadingAutoridad] = useState(false);
   const [loadingRepresentante, setLoadingRepresentante] = useState(false);
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
-  const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState("");
-
   const [modalLocalOpen, setModalLocalOpen] = useState(false);
   const [modalCrear, setModalCrear] = useState<"personal" | "autoridades" | null>(
     null
   );
+  const [modalBusquedaMaestro, setModalBusquedaMaestro] = useState<
+    "personal" | "autoridades" | null
+  >(null);
 
   /* Lógica 1 */
 
@@ -102,6 +104,12 @@ export default function RegistroVisitasPage() {
   const [docRepresentanteBusqueda, setDocRepresentanteBusqueda] = useState("");
 
   const soloNumeros = (value: string) => /^\d*$/.test(value);
+
+  const mostrarError = (mensaje: string) => {
+    toast.error(mensaje, {
+      duration: Infinity,
+    });
+  };
 
   const cambiarCodigoLocalBusqueda = (value: string) => {
     if (soloNumeros(value) && value.length <= 6) {
@@ -132,8 +140,9 @@ export default function RegistroVisitasPage() {
 
   const limpiarFormulario = () => {
     setFormData(initialData);
-    setMensaje("");
-    setError("");
+    setCodigoLocalBusqueda("");
+    setDocAutoridadBusqueda("");
+    setDocRepresentanteBusqueda("");
   };
 
   const limpiarLocalEscolar = () => {
@@ -213,14 +222,13 @@ export default function RegistroVisitasPage() {
   /* Inicio Función BuscarCodigoLocal */
 
   const buscarCodigoLocal = async () => {
-    setError("");
     setLoadingCodigoLocal(true);
 
     const codigoLocal = codigoLocalBusqueda.trim();
 
     try {
       if (codigoLocal.length !== 6) {
-        setError("El código local debe tener exactamente 6 números.");
+        mostrarError("El código local debe tener exactamente 6 números.");
         return;
       }
 
@@ -232,14 +240,14 @@ export default function RegistroVisitasPage() {
       });
 
       if (!local) {
-        setError("No se encontró el código local. Puede usar la búsqueda avanzada.");
+        mostrarError("No se encontró el código local. Puede usar la búsqueda avanzada.");
         return;
       }
 
       await aplicarLocalEscolar(local);
     } catch (err) {
       console.error(err);
-      setError("No se pudo buscar el código local.");
+      mostrarError("No se pudo buscar el código local.");
     } finally {
       setLoadingCodigoLocal(false);
     }
@@ -270,14 +278,13 @@ export default function RegistroVisitasPage() {
   /* Inicio Buscar Representante */
 
   const buscarRepresentante = async () => {
-    setError("");
     setLoadingRepresentante(true);
 
     const nroDocumento = docRepresentanteBusqueda.trim();
 
     try {
       if (nroDocumento.length !== 8) {
-        setError("El documento del representante PRONIED debe tener exactamente 8 números.");
+        mostrarError("El documento del representante PRONIED debe tener exactamente 8 números.");
         return;
       }
 
@@ -287,14 +294,14 @@ export default function RegistroVisitasPage() {
       });
 
       if (!persona) {
-        setError("No se encontró el personal. Puede registrarlo sin salir del formulario.");
+        mostrarError("No se encontró el personal. Puede registrarlo sin salir del formulario.");
         return;
       }
 
       aplicarRepresentante(persona, nroDocumento);
     } catch (err) {
       console.error(err);
-      setError("No se pudo buscar el representante PRONIED.");
+      mostrarError("No se pudo buscar el representante PRONIED.");
     } finally {
       setLoadingRepresentante(false);
     }
@@ -328,14 +335,13 @@ export default function RegistroVisitasPage() {
   /* Inicio BuscarAutoridad */
 
   const buscarAutoridad = async () => {
-    setError("");
     setLoadingAutoridad(true);
 
     const nroDocumento = docAutoridadBusqueda.trim();
 
     try {
       if (nroDocumento.length !== 8) {
-        setError("El documento de la autoridad debe tener exactamente 8 números.");
+        mostrarError("El documento de la autoridad debe tener exactamente 8 números.");
         return;
       }
 
@@ -345,14 +351,14 @@ export default function RegistroVisitasPage() {
       });
 
       if (!autoridad) {
-        setError("No se encontró la autoridad. Puede registrarla sin salir del formulario.");
+        mostrarError("No se encontró la autoridad. Puede registrarla sin salir del formulario.");
         return;
       }
 
       aplicarAutoridad(autoridad, nroDocumento);
     } catch (err) {
       console.error(err);
-      setError("No se pudo buscar la autoridad.");
+      mostrarError("No se pudo buscar la autoridad.");
     } finally {
       setLoadingAutoridad(false);
     }
@@ -379,6 +385,11 @@ export default function RegistroVisitasPage() {
       aplicarAutoridad(autoridad, nroDocumento);
     }
 
+    toast.success("Registro creado correctamente.", {
+      description: modalCrear === "personal" ? "Personal PRONIED registrado." : "Autoridad registrada.",
+      duration: Infinity,
+    });
+
     setModalCrear(null);
   };
 
@@ -401,18 +412,38 @@ export default function RegistroVisitasPage() {
   const solicitarGuardar = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setMensaje("");
-    setError("");
-
     const validacion = validar();
 
     if (validacion) {
-      setError(validacion);
+      mostrarError(validacion);
       return;
     }
 
     setConfirmSaveOpen(true);
   };
+
+  useEffect(() => {
+    const handleGuardarShortcut = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "g") {
+        event.preventDefault();
+
+        const validacion = validar();
+
+        if (validacion) {
+          mostrarError(validacion);
+          return;
+        }
+
+        setConfirmSaveOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleGuardarShortcut);
+
+    return () => {
+      window.removeEventListener("keydown", handleGuardarShortcut);
+    };
+  }, [formData]);
 
   const confirmarGuardar = async () => {
     setConfirmSaveOpen(false);
@@ -420,14 +451,17 @@ export default function RegistroVisitasPage() {
 
     try {
       const codigo = await crearTransaccion(config, formData);
-      setMensaje(`Visita registrada correctamente. Código generado: ${codigo}`);
+      toast.success("Visita registrada correctamente.", {
+        description: `Código generado: ${codigo}`,
+        duration: Infinity,
+      });
       setFormData(initialData);
       setCodigoLocalBusqueda("");
       setDocAutoridadBusqueda("");
       setDocRepresentanteBusqueda("");
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "No se pudo guardar la visita.");
+      mostrarError(err instanceof Error ? err.message : "No se pudo guardar la visita.");
     } finally {
       setSaving(false);
     }
@@ -457,19 +491,6 @@ export default function RegistroVisitasPage() {
           autocompletar información.
         </span>
       </div>
-
-      {(mensaje || error) && (
-        <div className="registro-message-zone">
-          {mensaje && (
-            <div className="status active" style={{ gap: 8 }}>
-              <CheckCircle size={16} />
-              {mensaje}
-            </div>
-          )}
-
-          {error && <div className="catalogo-error">{error}</div>}
-        </div>
-      )}
 
       <form className="registro-form-shell" onSubmit={solicitarGuardar}>
         <section className="registro-section-card section-visita">
@@ -591,6 +612,18 @@ export default function RegistroVisitasPage() {
                 inputMode="numeric"
                 maxLength={6}
                 onChange={(e) => cambiarCodigoLocalBusqueda(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    buscarCodigoLocal();
+                  }
+
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCodigoLocalBusqueda("");
+                  }
+                }}
               />
             </div>
 
@@ -683,7 +716,7 @@ export default function RegistroVisitasPage() {
             </div>
           </div>
 
-          <div className="registro-form-grid cols-4">
+          <div className="registro-form-grid cols-5">
             <div className="form-field">
               <label>Nro. DNI *</label>
               <input
@@ -692,6 +725,18 @@ export default function RegistroVisitasPage() {
                 inputMode="numeric"
                 maxLength={8}
                 onChange={(e) => cambiarDocAutoridadBusqueda(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    buscarAutoridad();
+                  }
+
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDocAutoridadBusqueda("");
+                  }
+                }}
               />
             </div>
 
@@ -705,6 +750,18 @@ export default function RegistroVisitasPage() {
               >
                 {loadingAutoridad ? <LoaderCircle className="spin-icon" size={17} /> : <Search size={17} />}
                 {loadingAutoridad ? "Buscando..." : "Buscar"}
+              </button>
+            </div>
+
+            <div className="form-field form-action-field">
+              <label>&nbsp;</label>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setModalBusquedaMaestro("autoridades")}
+              >
+                <Search size={17} />
+                Búsqueda avanzada
               </button>
             </div>
 
@@ -779,7 +836,7 @@ export default function RegistroVisitasPage() {
             </div>
           </div>
 
-          <div className="registro-form-grid cols-4">
+          <div className="registro-form-grid cols-5">
             <div className="form-field">
               <label>Nro. DNI *</label>
               <input
@@ -788,6 +845,18 @@ export default function RegistroVisitasPage() {
                 inputMode="numeric"
                 maxLength={8}
                 onChange={(e) => cambiarDocRepresentanteBusqueda(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    buscarRepresentante();
+                  }
+
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDocRepresentanteBusqueda("");
+                  }
+                }}
               />
             </div>
 
@@ -801,6 +870,18 @@ export default function RegistroVisitasPage() {
               >
                 {loadingRepresentante ? <LoaderCircle className="spin-icon" size={17} /> : <Search size={17} />}
                 {loadingRepresentante ? "Buscando..." : "Buscar"}
+              </button>
+            </div>
+
+            <div className="form-field form-action-field">
+              <label>&nbsp;</label>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setModalBusquedaMaestro("personal")}
+              >
+                <Search size={17} />
+                Búsqueda avanzada
               </button>
             </div>
 
@@ -920,6 +1001,24 @@ export default function RegistroVisitasPage() {
         <LocalEscolarSearchModal
           onClose={() => setModalLocalOpen(false)}
           onSelect={aplicarLocalEscolar}
+        />
+      )}
+
+      {modalBusquedaMaestro && (
+        <MaestroAdvancedSearchModal
+          tipo={modalBusquedaMaestro}
+          catalogos={catalogos}
+          onClose={() => setModalBusquedaMaestro(null)}
+          onSelect={(item) => {
+            if (modalBusquedaMaestro === "autoridades") {
+              aplicarAutoridad(item, String(item.values.NroDocumentoIdentidad ?? ""));
+              setDocAutoridadBusqueda(String(item.values.NroDocumentoIdentidad ?? ""));
+              return;
+            }
+
+            aplicarRepresentante(item, String(item.values.NroDocumentoIdentidad ?? ""));
+            setDocRepresentanteBusqueda(String(item.values.NroDocumentoIdentidad ?? ""));
+          }}
         />
       )}
 

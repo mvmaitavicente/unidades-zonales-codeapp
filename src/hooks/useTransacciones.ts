@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import type {
   TransaccionConfig,
   TransaccionFormData,
@@ -49,8 +50,20 @@ export function useTransacciones(config: TransaccionConfig) {
 
       if (itemId) {
         await actualizarTransaccion({ config, itemId, data });
+
+        toast.success("Registro actualizado correctamente.", {
+          description: `${config.titulo}: cambios guardados.`,
+          duration: Infinity,
+        });
       } else {
         codigo = await crearTransaccion(config, data);
+
+        toast.success("Registro creado correctamente.", {
+          description: codigo
+            ? `${config.titulo}: código generado ${codigo}.`
+            : `${config.titulo}: nuevo registro guardado.`,
+          duration: Infinity,
+        });
       }
 
       if (options?.recargar !== false) {
@@ -60,9 +73,9 @@ export function useTransacciones(config: TransaccionConfig) {
       return codigo;
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "No se pudo guardar el registro."
-      );
+      const mensaje = err instanceof Error ? err.message : "No se pudo guardar el registro.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
       throw err;
     } finally {
       setSaving(false);
@@ -75,12 +88,18 @@ export function useTransacciones(config: TransaccionConfig) {
 
     try {
       await eliminarTransaccion({ config, itemId });
+
+      toast.success("Registro eliminado correctamente.", {
+        description: `${config.titulo}: registro eliminado.`,
+        duration: Infinity,
+      });
+
       await cargar();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "No se pudo eliminar el registro."
-      );
+      const mensaje = err instanceof Error ? err.message : "No se pudo eliminar el registro.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
     } finally {
       setSaving(false);
     }

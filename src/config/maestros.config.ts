@@ -15,6 +15,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "tiposDocumento",
       },
       {
@@ -23,6 +24,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         placeholder: "Ingrese Nro. documento",
         validation: {
           dynamicDocumentFrom: "IdTipoDocIdentidad",
@@ -34,6 +36,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
       },
       {
         key: "Apellidos",
@@ -41,20 +44,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
-      },
-      {
-        key: "Correo",
-        label: "Correo",
-        type: "email",
-        visibleInTable: true,
-      },
-      {
-        key: "Cargo",
-        label: "Cargo",
-        type: "lookup",
-        required: true,
-        visibleInTable: true,
-        catalogoKey: "cargos",
+        visibleInDetail: true,
       },
       {
         key: "TipoEntidad",
@@ -62,7 +52,38 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "tiposEntidad",
+      },
+      {
+        key: "Cargo",
+        label: "Cargo",
+        type: "lookup",
+        required: true,
+        visibleInTable: true,
+        visibleInDetail: true,
+        catalogoKey: "cargos",
+      },
+      {
+        key: "Correo",
+        label: "Correo",
+        type: "email",
+        visibleInTable: true,
+        visibleInDetail: true,
+      },
+      {
+        key: "NroCelular",
+        label: "Celular",
+        type: "text",
+        visibleInTable: false,
+        visibleInDetail: true,
+        placeholder: "987654321",
+        validation: {
+          onlyNumbers: true,
+          startsWith: "9",
+          minLength: 9,
+          maxLength: 9,
+        },
       },
       {
         key: "Activo",
@@ -86,6 +107,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "tiposDocumento",
       },
       {
@@ -94,6 +116,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         placeholder: "Ingrese Nro. documento",
         validation: {
           dynamicDocumentFrom: "IdTipoDocIdentidad",
@@ -105,6 +128,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
       },
       {
         key: "Apellidos",
@@ -112,6 +136,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "text",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
       },
       {
         key: "IdUnidadZonal",
@@ -119,6 +144,7 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "unidadesZonales",
       },
       {
@@ -127,7 +153,16 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "cargos",
+      },
+      {
+        key: "IdCarreraPersonal",
+        label: "Carrera",
+        type: "lookup",
+        visibleInTable: false,
+        visibleInDetail: true,
+        catalogoKey: "carrerasPersonal",
       },
       {
         key: "IdModalidadContratacion",
@@ -135,11 +170,12 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
         type: "lookup",
         required: true,
         visibleInTable: true,
+        visibleInDetail: true,
         catalogoKey: "modalidadContratacion",
       },
       {
         key: "MontoRemuneracion",
-        label: "Remuneración",
+        label: "Monto Remuneración",
         type: "number",
         required: true,
         visibleInTable: false,
@@ -182,5 +218,4 @@ export const maestrosConfig: Record<string, MaestroConfig> = {
       },
     ],
   },
-  
 };

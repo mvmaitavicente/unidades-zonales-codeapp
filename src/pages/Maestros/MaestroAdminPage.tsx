@@ -9,6 +9,7 @@ import { useMaestro } from "../../hooks/useMaestro";
 import MaestroForm from "../../components/Maestros/MaestroForm";
 import MaestroModal from "../../components/Maestros/MaestroModal";
 import MaestroTable from "../../components/Maestros/MaestroTable";
+import MaestroDetail from "../../components/Maestros/MaestroDetail";
 
 import type { MaestroConfig, MaestroItem } from "../../types/maestro.types";
 
@@ -106,8 +107,6 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
       : Math.min((paginaActual - 1) * pageSize + 1, totalRegistros);
 
   const hasta = Math.min(paginaActual * pageSize, totalRegistros);
-
-  const detailFields = config.fields.filter((field) => field.visibleInDetail);
 
   return (
     <div className="page-content">
@@ -275,21 +274,10 @@ function MaestroAdminContent({ config }: { config: MaestroConfig }) {
       {itemDetalle && (
         <MaestroModal
           title="Detalle del registro"
-          subtitle="Información complementaria del registro seleccionado."
+          subtitle="Vista resumida y ordenada del maestro seleccionado."
           onClose={() => setItemDetalle(null)}
         >
-          {detailFields.length === 0 ? (
-            <p>No hay campos adicionales configurados para este registro.</p>
-          ) : (
-            <div className="detail-grid">
-              {detailFields.map((field) => (
-                <div className="detail-item" key={field.key}>
-                  <span>{field.label}</span>
-                  <strong>{String(itemDetalle.values[field.key] ?? "-")}</strong>
-                </div>
-              ))}
-            </div>
-          )}
+          <MaestroDetail config={config} item={itemDetalle} />
         </MaestroModal>
       )}
 

@@ -6,7 +6,8 @@ export type CatalogoGlobalKey =
   | "tiposEntidad"
   | "unidadesZonales"
   | "mediosCoordinacion"
-  | "modalidadContratacion";
+  | "modalidadContratacion"
+  | "carrerasPersonal";
 
 export type CatalogoGlobalConfig = {
   key: CatalogoGlobalKey;
@@ -44,6 +45,13 @@ export const catalogosGlobalConfig: CatalogoGlobalConfig[] = [
     key: "unidadesZonales",
     nombreTabla: "UZ_UnidadZonal",
     listId: SHAREPOINT_CONFIG.lists.unidadZonal,
+    campoTexto: "field_1",
+    campoActivo: "Activo",
+  },
+  {
+    key: "carrerasPersonal",
+    nombreTabla: "UZ_CarreraPersonal",
+    listId: SHAREPOINT_CONFIG.lists.carreraPersonal,
     campoTexto: "field_1",
     campoActivo: "Activo",
   },

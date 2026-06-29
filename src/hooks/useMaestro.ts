@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import type {
   MaestroConfig,
   MaestroFormData,
@@ -105,16 +106,37 @@ export function useMaestro(config: MaestroConfig) {
     setError("");
 
     try {
+      const nombreRegistro = [data.Nombres, data.Apellidos]
+        .map((value) => String(value ?? "").trim())
+        .filter(Boolean)
+        .join(" ");
+
       if (itemId) {
         await actualizarMaestro({ config, itemId, data });
+
+        toast.success("Registro actualizado correctamente.", {
+          description: nombreRegistro
+            ? `${nombreRegistro} fue actualizado.`
+            : `${config.titulo}: registro actualizado.`,
+          duration: Infinity,
+        });
       } else {
         await crearMaestro(config, data);
+
+        toast.success("Registro creado correctamente.", {
+          description: nombreRegistro
+            ? `${nombreRegistro} fue agregado a ${config.titulo.toLowerCase()}.`
+            : `${config.titulo}: nuevo registro guardado.`,
+          duration: Infinity,
+        });
       }
 
       await cargar();
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "No se pudo guardar el registro.");
+      const mensaje = err instanceof Error ? err.message : "No se pudo guardar el registro.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
       throw err;
     } finally {
       setSaving(false);
@@ -127,16 +149,33 @@ export function useMaestro(config: MaestroConfig) {
     setError("");
 
     try {
-    await cambiarEstadoMaestro({
-      config,
-      itemId: item.itemId,
-      activoActual,
-    });
+      await cambiarEstadoMaestro({
+        config,
+        itemId: item.itemId,
+        activoActual,
+      });
 
-    await cargar();
+      const nombreRegistro = [item.values.Nombres, item.values.Apellidos]
+        .map((value) => String(value ?? "").trim())
+        .filter(Boolean)
+        .join(" ");
+
+      toast.success(
+        activoActual ? "Registro eliminado correctamente." : "Registro restaurado correctamente.",
+        {
+          description: nombreRegistro
+            ? `${nombreRegistro} ${activoActual ? "fue inactivado" : "volvió a estar activo"}.`
+            : `${config.titulo}: estado actualizado.`,
+          duration: Infinity,
+        }
+      );
+
+      await cargar();
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "No se pudo cambiar el estado.");
+      const mensaje = err instanceof Error ? err.message : "No se pudo cambiar el estado.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
       throw err;
     } finally {
       setSaving(false);

@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "install-system": "tsx scripts/install-system/install.ts"
+  },
+  "devDependencies": {
+    "tsx": "latest"
+  },
+  "dependencies": {
+    "@azure/identity": "latest",
+    "dotenv": "latest"
+  }
+}

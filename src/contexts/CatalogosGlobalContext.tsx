@@ -49,6 +49,7 @@ const initialState: CatalogosGlobalState = {
   unidadesZonales: [],
   mediosCoordinacion: [],
   modalidadContratacion: [],
+  carrerasPersonal: [],
 };
 
 export const CatalogosGlobalContext =

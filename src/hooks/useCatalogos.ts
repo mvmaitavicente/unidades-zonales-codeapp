@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type {
   CatalogoCampoExtra,
   CatalogoFormData,
@@ -53,28 +54,46 @@ export function useCatalogos(params: Params) {
     setError("");
 
     try {
-    if (data.itemId) {
-      await actualizarCatalogo({
-        siteId: params.siteId,
-        listId: params.listId,
-        campoDescripcion: params.campoDescripcion,
-        data,
-        nombreTabla: params.nombreTabla,
-      });
-    } else {
-      await crearCatalogo({
-        siteId: params.siteId,
-        listId: params.listId,
-        campoDescripcion: params.campoDescripcion,
-        data,
-        nombreTabla: params.nombreTabla,
-      });
-    }
+      const descripcion = String(data.descripcion ?? "").trim();
 
-    await cargar();
+      if (data.itemId) {
+        await actualizarCatalogo({
+          siteId: params.siteId,
+          listId: params.listId,
+          campoDescripcion: params.campoDescripcion,
+          data,
+          nombreTabla: params.nombreTabla,
+        });
+
+        toast.success("Registro actualizado correctamente.", {
+          description: descripcion
+            ? `${descripcion} fue actualizado.`
+            : `${params.nombreTabla ?? "Catálogo"}: registro actualizado.`,
+          duration: Infinity,
+        });
+      } else {
+        await crearCatalogo({
+          siteId: params.siteId,
+          listId: params.listId,
+          campoDescripcion: params.campoDescripcion,
+          data,
+          nombreTabla: params.nombreTabla,
+        });
+
+        toast.success("Registro creado correctamente.", {
+          description: descripcion
+            ? `${descripcion} fue agregado a ${params.nombreTabla ?? "catálogo"}.`
+            : `${params.nombreTabla ?? "Catálogo"}: nuevo registro guardado.`,
+          duration: Infinity,
+        });
+      }
+
+      await cargar();
     } catch (err) {
       console.error(err);
-      setError("No se pudo guardar el registro.");
+      const mensaje = "No se pudo guardar el registro.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
       throw err;
     } finally {
       setSaving(false);
@@ -86,18 +105,30 @@ export function useCatalogos(params: Params) {
     setError("");
 
     try {
-    await cambiarEstadoCatalogo({
-      siteId: params.siteId,
-      listId: params.listId,
-      itemId,
-      activoActual,
-      nombreTabla: params.nombreTabla,
-    });
+      await cambiarEstadoCatalogo({
+        siteId: params.siteId,
+        listId: params.listId,
+        itemId,
+        activoActual,
+        nombreTabla: params.nombreTabla,
+      });
 
-    await cargar();
+      toast.success(
+        activoActual ? "Registro eliminado correctamente." : "Registro restaurado correctamente.",
+        {
+          description: activoActual
+            ? `${params.nombreTabla ?? "Catálogo"}: el registro fue inactivado.`
+            : `${params.nombreTabla ?? "Catálogo"}: el registro volvió a estar activo.`,
+          duration: Infinity,
+        }
+      );
+
+      await cargar();
     } catch (err) {
       console.error(err);
-      setError("No se pudo cambiar el estado del registro.");
+      const mensaje = "No se pudo cambiar el estado del registro.";
+      setError(mensaje);
+      toast.error(mensaje, { duration: Infinity });
       throw err;
     } finally {
       setSaving(false);
